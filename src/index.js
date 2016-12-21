@@ -6,7 +6,7 @@ class Mongo {
     this.options = Object.assign({}, defaultOptions, options);
   }
 
-  createUser() {
+  createUser() { // eslint-disable-line class-methods-use-this
     return Promise.resolve('user');
   }
 }
