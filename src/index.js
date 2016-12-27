@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { get } from 'lodash';
 
 // TODO setup all mongodb indexes
 
@@ -11,9 +11,9 @@ class Mongo {
         updatedAt: 'updatedAt',
       },
     };
-    this.options = Object.assign({}, defaultOptions, options);
-    if (_.get(db, 'constructor.define.name') !== 'Db') {
-      throw new Error('A valid database connetion object is required');
+    this.options = { ...defaultOptions, ...options };
+    if (get(db, 'constructor.define.name') !== 'Db') {
+      throw new Error('A valid database connection object is required');
     }
     this.db = db;
     this.collection = this.db.collection(this.options.collectionName);

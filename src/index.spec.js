@@ -47,7 +47,7 @@ describe('Mongo', () => {
         new Mongo(); // eslint-disable-line no-new
         throw new Error();
       } catch (err) {
-        expect(err.message).toBe('A valid database connetion object is required');
+        expect(err.message).toBe('A valid database connection object is required');
       }
     });
   });
