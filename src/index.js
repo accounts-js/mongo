@@ -72,12 +72,7 @@ class Mongo {
     if (options.email) {
       user.emails = [{ address: options.email, verified: false }];
     }
-    return this.collection.insert(user).then((data) => {
-      if (data.ops) {
-        return data.ops[0];
-      }
-      return data;
-    });
+    return this.collection.insertOne(user).then(data => data.ops[0]);
   }
 
   findUserByEmail(email: string): UserObjectType {

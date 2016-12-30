@@ -61,6 +61,27 @@ describe('Mongo', () => {
       expect(ret.emails[0].verified).toBe(false);
       expect(ret.createdAt).toBeTruthy();
     });
+
+    it('should not set password', async () => {
+      const mongo = new Mongo(db);
+      const ret = await mongo.createUser({ email: user.email });
+      expect(ret._id).toBeTruthy(); // eslint-disable-line no-underscore-dangle
+      expect(ret.services.password).not.toBeTruthy();
+    });
+
+    it('should not set username', async () => {
+      const mongo = new Mongo(db);
+      const ret = await mongo.createUser({ email: user.email });
+      expect(ret._id).toBeTruthy(); // eslint-disable-line no-underscore-dangle
+      expect(ret.username).not.toBeTruthy();
+    });
+
+    it('should not set email', async () => {
+      const mongo = new Mongo(db);
+      const ret = await mongo.createUser({ username: user.username });
+      expect(ret._id).toBeTruthy(); // eslint-disable-line no-underscore-dangle
+      expect(ret.emails).not.toBeTruthy();
+    });
   });
 
   describe('findUserByEmail', () => {
