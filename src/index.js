@@ -92,14 +92,15 @@ class Mongo {
     if (!user) {
       throw new Error('User not found');
     }
-    return this.collection.update({ _id: userId }, {
+    await this.collection.update({ _id: user._id }, {
       $addToSet: {
         emails: {
           address: newEmail,
           verified,
         },
       },
-    }).then(() => true);
+    });
+    return true;
   }
 
   async removeEmail(userId: string, email: string): Promise<boolean> {
@@ -107,9 +108,21 @@ class Mongo {
     if (!user) {
       throw new Error('User not found');
     }
-    return this.collection.update({ _id: user._id }, {
+    await this.collection.update({ _id: user._id }, {
       $pull: { emails: { address: email } },
-    }).then(() => true);
+    });
+    return true;
+  }
+
+  async setUsername(userId: string, newUsername: string): Promise<boolean> {
+    const user = await this.collection.findOne({ _id: userId });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    await this.collection.update({ _id: user._id }, {
+      $set: { username: newUsername },
+    });
+    return true;
   }
 }
 

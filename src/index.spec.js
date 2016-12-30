@@ -173,5 +173,27 @@ describe('Mongo', () => {
     });
   });
 
+  describe('setUsername', () => {
+    it('should throw if user is not found', async () => {
+      const mongo = new Mongo(db);
+      try {
+        await mongo.setUsername('unknowuser');
+        throw new Error();
+      } catch (err) {
+        expect(err.message).toEqual('User not found');
+      }
+    });
+
+    it('should change username', async () => {
+      const username = 'johnsdoe';
+      const mongo = new Mongo(db);
+      let retUser = await mongo.createUser(user);
+      const ret = await mongo.setUsername(retUser._id, username);
+      retUser = await mongo.findUserById(retUser._id);
+      expect(ret).toBeTruthy();
+      expect(retUser.username).toEqual(username);
+    });
+  });
+
   afterAll(closeConnection);
 });
