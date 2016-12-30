@@ -10,5 +10,8 @@
   "env": {
     "node": true,
     "jest": true
+  },
+  "rules": {
+    "no-underscore-dangle": ["error", { "allow": ["_id"] }]
   }
 }

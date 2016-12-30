@@ -75,12 +75,41 @@ class Mongo {
     return this.collection.insertOne(user).then(data => data.ops[0]);
   }
 
+  findUserById(id: string): UserObjectType {
+    return this.collection.findOne({ _id: id });
+  }
+
   findUserByEmail(email: string): UserObjectType {
     return this.collection.findOne({ 'emails.address': email });
   }
 
   findUserByUsername(username: string): UserObjectType {
     return this.collection.findOne({ username });
+  }
+
+  async addEmail(userId: string, newEmail: string, verified: boolean): boolean {
+    const user = await this.collection.findOne({ _id: userId });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return this.collection.update({ _id: userId }, {
+      $addToSet: {
+        emails: {
+          address: newEmail,
+          verified,
+        },
+      },
+    }).then(() => true);
+  }
+
+  async removeEmail(userId, email) {
+    const user = await this.collection.findOne({ _id: userId });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return this.collection.update({ _id: user._id }, {
+      $pull: { emails: { address: email } },
+    }).then(() => true);
   }
 }
 
