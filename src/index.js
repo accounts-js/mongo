@@ -1,9 +1,47 @@
+// @flow
+
 import { get } from 'lodash';
 
 // TODO setup all mongodb indexes
 
+export type MongoOptionsType = {
+  collectionName: string,
+  timestamps: {
+    createdAt: string,
+    updatedAt: string,
+  }
+};
+
+export type MongoUserObjectType = {
+  username?: string,
+  profile?: Object,
+  services: {
+    password?: {
+      bcrypt: string,
+    },
+  },
+  emails?: [{
+    address: string,
+    verified: boolean,
+  }],
+};
+
+// TODO Will import from @accounts/account once it's published on npm
+export type UserObjectType = {
+  username: ?string,
+  email: ?string,
+  id: ?string,
+  profile: ?Object,
+  password: ?string,
+};
+
 class Mongo {
-  constructor(db, options) {
+  options: MongoOptionsType;
+  // TODO definition for mongodb connection object
+  db: any;
+  collection: any;
+
+  constructor(db: any, options: MongoOptionsType) {
     const defaultOptions = {
       collectionName: 'users',
       timestamps: {
@@ -19,10 +57,10 @@ class Mongo {
     this.collection = this.db.collection(this.options.collectionName);
   }
 
-  createUser(options) {
-    const user = {
+  createUser(options: UserObjectType): UserObjectType {
+    const user: MongoUserObjectType = {
       services: {},
-      [this.options.timestamps.createdAt]: new Date(),
+      [this.options.timestamps.createdAt]: Date.now(),
     };
     // TODO hash password
     if (options.password) {
@@ -42,11 +80,11 @@ class Mongo {
     });
   }
 
-  findUserByEmail(email) {
+  findUserByEmail(email: string): UserObjectType {
     return this.collection.findOne({ 'emails.address': email });
   }
 
-  findUserByUsername(username) {
+  findUserByUsername(username: string): UserObjectType {
     return this.collection.findOne({ username });
   }
 }
