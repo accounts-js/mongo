@@ -57,7 +57,7 @@ class Mongo {
     this.collection = this.db.collection(this.options.collectionName);
   }
 
-  createUser(options: UserObjectType): UserObjectType {
+  createUser(options: UserObjectType): Promise<UserObjectType> {
     const user: MongoUserObjectType = {
       services: {},
       [this.options.timestamps.createdAt]: Date.now(),
@@ -75,19 +75,19 @@ class Mongo {
     return this.collection.insertOne(user).then(data => data.ops[0]);
   }
 
-  findUserById(id: string): UserObjectType {
+  findUserById(id: string): Promise<UserObjectType> {
     return this.collection.findOne({ _id: id });
   }
 
-  findUserByEmail(email: string): UserObjectType {
+  findUserByEmail(email: string): Promise<UserObjectType> {
     return this.collection.findOne({ 'emails.address': email });
   }
 
-  findUserByUsername(username: string): UserObjectType {
+  findUserByUsername(username: string): Promise<UserObjectType> {
     return this.collection.findOne({ username });
   }
 
-  async addEmail(userId: string, newEmail: string, verified: boolean): boolean {
+  async addEmail(userId: string, newEmail: string, verified: boolean): Promise<boolean> {
     const user = await this.collection.findOne({ _id: userId });
     if (!user) {
       throw new Error('User not found');
@@ -102,7 +102,7 @@ class Mongo {
     }).then(() => true);
   }
 
-  async removeEmail(userId, email) {
+  async removeEmail(userId: string, email: string): Promise<boolean> {
     const user = await this.collection.findOne({ _id: userId });
     if (!user) {
       throw new Error('User not found');
