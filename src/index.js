@@ -2,8 +2,6 @@
 
 import { get } from 'lodash';
 
-// TODO setup all mongodb indexes
-
 export type MongoOptionsType = {
   collectionName: string,
   timestamps: {
@@ -55,6 +53,11 @@ class Mongo {
     }
     this.db = db;
     this.collection = this.db.collection(this.options.collectionName);
+  }
+
+  async setupIndexes(): Promise<boolean> {
+    await this.collection.createIndex('username', { unique: 1, sparse: 1 });
+    await this.collection.createIndex('emails.address', { unique: 1, sparse: 1 });
   }
 
   createUser(options: UserObjectType): Promise<UserObjectType> {

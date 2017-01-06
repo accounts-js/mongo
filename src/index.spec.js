@@ -17,11 +17,18 @@ function createConnection(cb) {
   });
 }
 
-function closeConnection(cb) {
+function dropDatabase(cb) {
   db.dropDatabase((err) => {
-    if (err) cb(err);
+    if (err) return cb(err);
+    return cb();
+  });
+}
+
+function closeConnection(cb) {
+  dropDatabase((err) => {
     db.close();
-    cb();
+    if (err) return cb(err);
+    return cb();
   });
 }
 
@@ -49,6 +56,22 @@ describe('Mongo', () => {
       } catch (err) {
         expect(err.message).toBe('A valid database connection object is required');
       }
+    });
+  });
+
+  describe('setupIndexes', () => {
+    it('should create indexes', async () => {
+      const mongo = new Mongo(db);
+      await mongo.setupIndexes();
+      const ret = await mongo.collection.indexInformation();
+      expect(ret).toBeTruthy();
+      expect(ret._id_[0]).toEqual(['_id', 1]); // eslint-disable-line no-underscore-dangle
+      expect(ret.username_1[0]).toEqual(['username', 1]);
+      expect(ret['emails.address_1'][0]).toEqual(['emails.address', 1]);
+    });
+
+    afterAll((done) => {
+      dropDatabase(done);
     });
   });
 
