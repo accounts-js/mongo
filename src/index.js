@@ -58,6 +58,7 @@ class Mongo {
   async setupIndexes(): Promise<boolean> {
     await this.collection.createIndex('username', { unique: 1, sparse: 1 });
     await this.collection.createIndex('emails.address', { unique: 1, sparse: 1 });
+    return true;
   }
 
   createUser(options: UserObjectType): Promise<UserObjectType> {
