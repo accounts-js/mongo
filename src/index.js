@@ -1,6 +1,7 @@
 // @flow
 
 import { get } from 'lodash';
+import { DBDriver, UserObjectType } from '@accounts/accounts';
 
 export type MongoOptionsType = {
   collectionName: string,
@@ -24,22 +25,14 @@ export type MongoUserObjectType = {
   }],
 };
 
-// TODO Will import from @accounts/account once it's published on npm
-export type UserObjectType = {
-  username: ?string,
-  email: ?string,
-  id: ?string,
-  profile: ?Object,
-  password: ?string,
-};
-
-class Mongo {
+class Mongo extends DBDriver {
   options: MongoOptionsType;
   // TODO definition for mongodb connection object
   db: any;
   collection: any;
 
   constructor(db: any, options: MongoOptionsType) {
+    super();
     const defaultOptions = {
       collectionName: 'users',
       timestamps: {
@@ -79,24 +72,20 @@ class Mongo {
     return this.collection.insertOne(user).then(data => data.ops[0]);
   }
 
-  findUserById(id: string): Promise<UserObjectType> {
+  findUserById(id: string): Promise<UserObjectType | null> {
     return this.collection.findOne({ _id: id });
   }
 
-  findUserByEmail(email: string): Promise<UserObjectType> {
+  findUserByEmail(email: string): Promise<UserObjectType | null> {
     return this.collection.findOne({ 'emails.address': email });
   }
 
-  findUserByUsername(username: string): Promise<UserObjectType> {
+  findUserByUsername(username: string): Promise<UserObjectType | null> {
     return this.collection.findOne({ username });
   }
 
   async addEmail(userId: string, newEmail: string, verified: boolean): Promise<boolean> {
-    const user = await this.collection.findOne({ _id: userId });
-    if (!user) {
-      throw new Error('User not found');
-    }
-    await this.collection.update({ _id: user._id }, {
+    const ret = await this.collection.update({ _id: userId }, {
       $addToSet: {
         emails: {
           address: newEmail,
@@ -104,28 +93,29 @@ class Mongo {
         },
       },
     });
+    if (ret.result.nModified === 0) {
+      throw new Error('User not found');
+    }
     return true;
   }
 
   async removeEmail(userId: string, email: string): Promise<boolean> {
-    const user = await this.collection.findOne({ _id: userId });
-    if (!user) {
-      throw new Error('User not found');
-    }
-    await this.collection.update({ _id: user._id }, {
+    const ret = await this.collection.update({ _id: userId }, {
       $pull: { emails: { address: email } },
     });
+    if (ret.result.nModified === 0) {
+      throw new Error('User not found');
+    }
     return true;
   }
 
   async setUsername(userId: string, newUsername: string): Promise<boolean> {
-    const user = await this.collection.findOne({ _id: userId });
-    if (!user) {
-      throw new Error('User not found');
-    }
-    await this.collection.update({ _id: user._id }, {
+    const ret = await this.collection.update({ _id: userId }, {
       $set: { username: newUsername },
     });
+    if (ret.result.nModified === 0) {
+      throw new Error('User not found');
+    }
     return true;
   }
 }

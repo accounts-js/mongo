@@ -53,6 +53,7 @@
     "webpack-node-externals": "^1.5.4"
   },
   "dependencies": {
+    "@accounts/accounts": "git+https://github.com/js-accounts/accounts.git#git-package",
     "lodash": "^4.17.3",
     "mongodb": "^2.2.16"
   }
