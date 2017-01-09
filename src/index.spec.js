@@ -101,6 +101,12 @@ describe('Mongo', () => {
       expect(ret._id).toBeTruthy();
       expect(ret.emails).not.toBeTruthy();
     });
+
+    it('email should be lowercase', async () => {
+      const ret = await mongo.createUser({ email: 'JohN@doe.com' });
+      expect(ret._id).toBeTruthy();
+      expect(ret.emails[0].address).toEqual('john@doe.com');
+    });
   });
 
   describe('findUserById', () => {
@@ -126,6 +132,13 @@ describe('Mongo', () => {
       const ret = await mongo.findUserByEmail(user.email);
       expect(ret).toBeTruthy();
     });
+
+    it('should return user with uppercase email', async () => {
+      await mongo.createUser({ email: 'JOHN@DOES.COM' });
+      const ret = await mongo.findUserByEmail('JOHN@DOES.COM');
+      expect(ret._id).toBeTruthy();
+      expect(ret.emails[0].address).toEqual('john@does.com');
+    });
   });
 
   describe('findUserByUsername', () => {
@@ -143,7 +156,7 @@ describe('Mongo', () => {
   describe('addEmail', () => {
     it('should throw if user is not found', async () => {
       try {
-        await mongo.addEmail('unknowuser');
+        await mongo.addEmail('unknowuser', 'unknowemail');
         throw new Error();
       } catch (err) {
         expect(err.message).toEqual('User not found');
@@ -158,12 +171,22 @@ describe('Mongo', () => {
       expect(ret).toBeTruthy();
       expect(retUser.emails.length).toEqual(2);
     });
+
+    it('should add lowercase email', async () => {
+      const email = 'johnS@doe.com';
+      let retUser = await mongo.createUser(user);
+      const ret = await mongo.addEmail(retUser._id, email, false);
+      retUser = await mongo.findUserByEmail(email);
+      expect(ret).toBeTruthy();
+      expect(retUser.emails.length).toEqual(2);
+      expect(retUser.emails[1].address).toEqual('johns@doe.com');
+    });
   });
 
   describe('removeEmail', () => {
     it('should throw if user is not found', async () => {
       try {
-        await mongo.removeEmail('unknowuser');
+        await mongo.removeEmail('unknowuser', 'unknowemail');
         throw new Error();
       } catch (err) {
         expect(err.message).toEqual('User not found');
@@ -175,6 +198,17 @@ describe('Mongo', () => {
       let retUser = await mongo.createUser(user);
       await mongo.addEmail(retUser._id, email, false);
       const ret = await mongo.removeEmail(retUser._id, user.email, false);
+      retUser = await mongo.findUserById(retUser._id);
+      expect(ret).toBeTruthy();
+      expect(retUser.emails.length).toEqual(1);
+      expect(retUser.emails[0].address).toEqual(email);
+    });
+
+    it('should remove uppercase email', async () => {
+      const email = 'johns@doe.com';
+      let retUser = await mongo.createUser(user);
+      await mongo.addEmail(retUser._id, email, false);
+      const ret = await mongo.removeEmail(retUser._id, 'JOHN@doe.com', false);
       retUser = await mongo.findUserById(retUser._id);
       expect(ret).toBeTruthy();
       expect(retUser.emails.length).toEqual(1);

@@ -67,20 +67,20 @@ class Mongo extends DBDriver {
       user.username = options.username;
     }
     if (options.email) {
-      user.emails = [{ address: options.email, verified: false }];
+      user.emails = [{ address: options.email.toLowerCase(), verified: false }];
     }
     return this.collection.insertOne(user).then(data => data.ops[0]);
   }
 
-  findUserById(id: string): Promise<UserObjectType | null> {
+  findUserById(id: string): Promise<?UserObjectType> {
     return this.collection.findOne({ _id: id });
   }
 
-  findUserByEmail(email: string): Promise<UserObjectType | null> {
-    return this.collection.findOne({ 'emails.address': email });
+  findUserByEmail(email: string): Promise<?UserObjectType> {
+    return this.collection.findOne({ 'emails.address': email.toLowerCase() });
   }
 
-  findUserByUsername(username: string): Promise<UserObjectType | null> {
+  findUserByUsername(username: string): Promise<?UserObjectType> {
     return this.collection.findOne({ username });
   }
 
@@ -88,7 +88,7 @@ class Mongo extends DBDriver {
     const ret = await this.collection.update({ _id: userId }, {
       $addToSet: {
         emails: {
-          address: newEmail,
+          address: newEmail.toLowerCase(),
           verified,
         },
       },
@@ -101,7 +101,7 @@ class Mongo extends DBDriver {
 
   async removeEmail(userId: string, email: string): Promise<boolean> {
     const ret = await this.collection.update({ _id: userId }, {
-      $pull: { emails: { address: email } },
+      $pull: { emails: { address: email.toLowerCase() } },
     });
     if (ret.result.nModified === 0) {
       throw new Error('User not found');
