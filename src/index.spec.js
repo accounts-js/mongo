@@ -153,6 +153,24 @@ describe('Mongo', () => {
     });
   });
 
+  describe('findPasswordHash', () => {
+    it('should throw if user is not found', async () => {
+      try {
+        await mongo.findPasswordHash('unknowuser');
+        throw new Error();
+      } catch (err) {
+        expect(err.message).toEqual('User not found');
+      }
+    });
+
+    it('should return hash', async () => {
+      const retUser = await mongo.createUser(user);
+      const ret = await mongo.findPasswordHash(retUser._id);
+      expect(ret).toBeTruthy();
+      expect(ret).toEqual(retUser.services.password.bcrypt);
+    });
+  });
+
   describe('addEmail', () => {
     it('should throw if user is not found', async () => {
       try {
@@ -166,18 +184,16 @@ describe('Mongo', () => {
     it('should add email', async () => {
       const email = 'johns@doe.com';
       let retUser = await mongo.createUser(user);
-      const ret = await mongo.addEmail(retUser._id, email, false);
+      await mongo.addEmail(retUser._id, email, false);
       retUser = await mongo.findUserByEmail(email);
-      expect(ret).toBeTruthy();
       expect(retUser.emails.length).toEqual(2);
     });
 
     it('should add lowercase email', async () => {
       const email = 'johnS@doe.com';
       let retUser = await mongo.createUser(user);
-      const ret = await mongo.addEmail(retUser._id, email, false);
+      await mongo.addEmail(retUser._id, email, false);
       retUser = await mongo.findUserByEmail(email);
-      expect(ret).toBeTruthy();
       expect(retUser.emails.length).toEqual(2);
       expect(retUser.emails[1].address).toEqual('johns@doe.com');
     });
@@ -197,9 +213,8 @@ describe('Mongo', () => {
       const email = 'johns@doe.com';
       let retUser = await mongo.createUser(user);
       await mongo.addEmail(retUser._id, email, false);
-      const ret = await mongo.removeEmail(retUser._id, user.email, false);
+      await mongo.removeEmail(retUser._id, user.email, false);
       retUser = await mongo.findUserById(retUser._id);
-      expect(ret).toBeTruthy();
       expect(retUser.emails.length).toEqual(1);
       expect(retUser.emails[0].address).toEqual(email);
     });
@@ -208,9 +223,8 @@ describe('Mongo', () => {
       const email = 'johns@doe.com';
       let retUser = await mongo.createUser(user);
       await mongo.addEmail(retUser._id, email, false);
-      const ret = await mongo.removeEmail(retUser._id, 'JOHN@doe.com', false);
+      await mongo.removeEmail(retUser._id, 'JOHN@doe.com', false);
       retUser = await mongo.findUserById(retUser._id);
-      expect(ret).toBeTruthy();
       expect(retUser.emails.length).toEqual(1);
       expect(retUser.emails[0].address).toEqual(email);
     });
@@ -229,10 +243,28 @@ describe('Mongo', () => {
     it('should change username', async () => {
       const username = 'johnsdoe';
       let retUser = await mongo.createUser(user);
-      const ret = await mongo.setUsername(retUser._id, username);
+      await mongo.setUsername(retUser._id, username);
       retUser = await mongo.findUserById(retUser._id);
-      expect(ret).toBeTruthy();
       expect(retUser.username).toEqual(username);
+    });
+  });
+
+  describe('setPasssword', () => {
+    it('should throw if user is not found', async () => {
+      try {
+        await mongo.setPasssword('unknowuser');
+        throw new Error();
+      } catch (err) {
+        expect(err.message).toEqual('User not found');
+      }
+    });
+
+    it('should change username', async () => {
+      const newPassword = 'newpass';
+      let retUser = await mongo.createUser(user);
+      await mongo.setPasssword(retUser._id, newPassword);
+      retUser = await mongo.findUserById(retUser._id);
+      expect(retUser.services.password.bcrypt).toEqual(newPassword);
     });
   });
 

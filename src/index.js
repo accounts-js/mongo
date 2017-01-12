@@ -48,10 +48,9 @@ class Mongo extends DBDriver {
     this.collection = this.db.collection(this.options.collectionName);
   }
 
-  async setupIndexes(): Promise<boolean> {
+  async setupIndexes(): Promise<void> {
     await this.collection.createIndex('username', { unique: 1, sparse: 1 });
     await this.collection.createIndex('emails.address', { unique: 1, sparse: 1 });
-    return true;
   }
 
   createUser(options: UserObjectType): Promise<UserObjectType> {
@@ -72,8 +71,8 @@ class Mongo extends DBDriver {
     return this.collection.insertOne(user).then(data => data.ops[0]);
   }
 
-  findUserById(id: string): Promise<?UserObjectType> {
-    return this.collection.findOne({ _id: id });
+  findUserById(userId: string): Promise<?UserObjectType> {
+    return this.collection.findOne({ _id: userId });
   }
 
   findUserByEmail(email: string): Promise<?UserObjectType> {
@@ -84,7 +83,15 @@ class Mongo extends DBDriver {
     return this.collection.findOne({ username });
   }
 
-  async addEmail(userId: string, newEmail: string, verified: boolean): Promise<boolean> {
+  async findPasswordHash(userId: string): Promise<?string> {
+    const user = await this.findUserById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return user.services.password.bcrypt;
+  }
+
+  async addEmail(userId: string, newEmail: string, verified: boolean): Promise<void> {
     const ret = await this.collection.update({ _id: userId }, {
       $addToSet: {
         emails: {
@@ -96,27 +103,34 @@ class Mongo extends DBDriver {
     if (ret.result.nModified === 0) {
       throw new Error('User not found');
     }
-    return true;
   }
 
-  async removeEmail(userId: string, email: string): Promise<boolean> {
+  async removeEmail(userId: string, email: string): Promise<void> {
     const ret = await this.collection.update({ _id: userId }, {
       $pull: { emails: { address: email.toLowerCase() } },
     });
     if (ret.result.nModified === 0) {
       throw new Error('User not found');
     }
-    return true;
   }
 
-  async setUsername(userId: string, newUsername: string): Promise<boolean> {
+  async setUsername(userId: string, newUsername: string): Promise<void> {
     const ret = await this.collection.update({ _id: userId }, {
       $set: { username: newUsername },
     });
     if (ret.result.nModified === 0) {
       throw new Error('User not found');
     }
-    return true;
+  }
+
+  async setPasssword(userId: string, newPassword: string): Promise<void> {
+    // TODO hash newPassword
+    const ret = await this.collection.update({ _id: userId }, {
+      $set: { 'services.password.bcrypt': newPassword },
+    });
+    if (ret.result.nModified === 0) {
+      throw new Error('User not found');
+    }
   }
 }
 
