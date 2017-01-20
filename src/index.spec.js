@@ -252,19 +252,20 @@ describe('Mongo', () => {
   describe('setPasssword', () => {
     it('should throw if user is not found', async () => {
       try {
-        await mongo.setPasssword('unknowuser');
+        await mongo.setPasssword('unknowuser', 'toto');
         throw new Error();
       } catch (err) {
         expect(err.message).toEqual('User not found');
       }
     });
 
-    it('should change username', async () => {
+    it('should change password', async () => {
       const newPassword = 'newpass';
       let retUser = await mongo.createUser(user);
       await mongo.setPasssword(retUser._id, newPassword);
       retUser = await mongo.findUserById(retUser._id);
-      expect(retUser.services.password.bcrypt).toEqual(newPassword);
+      expect(retUser.services.password.bcrypt).toBeTruthy();
+      expect(retUser.services.password.bcrypt).not.toEqual(newPassword);
     });
   });
 

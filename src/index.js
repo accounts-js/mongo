@@ -1,7 +1,11 @@
 // @flow
 
 import { get } from 'lodash';
-import { DBDriver, UserObjectType } from '@accounts/accounts';
+import { encryption } from '@accounts/server';
+import type {
+  CreateUserType,
+  UserObjectType,
+} from '@accounts/common';
 
 export type MongoOptionsType = {
   collectionName: string,
@@ -25,14 +29,13 @@ export type MongoUserObjectType = {
   }],
 };
 
-class Mongo extends DBDriver {
+class Mongo {
   options: MongoOptionsType;
   // TODO definition for mongodb connection object
   db: any;
   collection: any;
 
   constructor(db: any, options: MongoOptionsType) {
-    super();
     const defaultOptions = {
       collectionName: 'users',
       timestamps: {
@@ -53,14 +56,13 @@ class Mongo extends DBDriver {
     await this.collection.createIndex('emails.address', { unique: 1, sparse: 1 });
   }
 
-  createUser(options: UserObjectType): Promise<UserObjectType> {
+  async createUser(options: CreateUserType): Promise<UserObjectType> {
     const user: MongoUserObjectType = {
       services: {},
       [this.options.timestamps.createdAt]: Date.now(),
     };
-    // TODO hash password
     if (options.password) {
-      user.services.password = { bcrypt: options.password };
+      user.services.password = { bcrypt: await encryption.hashPassword(options.password) };
     }
     if (options.username) {
       user.username = options.username;
@@ -68,7 +70,8 @@ class Mongo extends DBDriver {
     if (options.email) {
       user.emails = [{ address: options.email.toLowerCase(), verified: false }];
     }
-    return this.collection.insertOne(user).then(data => data.ops[0]);
+    const ret = await this.collection.insertOne(user);
+    return ret.ops[0];
   }
 
   findUserById(userId: string): Promise<?UserObjectType> {
@@ -126,7 +129,7 @@ class Mongo extends DBDriver {
   async setPasssword(userId: string, newPassword: string): Promise<void> {
     // TODO hash newPassword
     const ret = await this.collection.update({ _id: userId }, {
-      $set: { 'services.password.bcrypt': newPassword },
+      $set: { 'services.password.bcrypt': await encryption.hashPassword(newPassword) },
     });
     if (ret.result.nModified === 0) {
       throw new Error('User not found');
