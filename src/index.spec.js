@@ -39,6 +39,10 @@ function closeConnection(cb) {
   });
 }
 
+function delay(time) {
+  return new Promise(resolve => setTimeout(() => resolve(), time));
+}
+
 describe('Mongo', () => {
   beforeAll(createConnection);
 
@@ -192,6 +196,7 @@ describe('Mongo', () => {
     it('should add email', async () => {
       const email = 'johns@doe.com';
       let retUser = await mongo.createUser(user);
+      await delay(10);
       await mongo.addEmail(retUser._id, email, false);
       retUser = await mongo.findUserByEmail(email);
       expect(retUser.emails.length).toEqual(2);
@@ -221,6 +226,7 @@ describe('Mongo', () => {
     it('should remove email', async () => {
       const email = 'johns@doe.com';
       let retUser = await mongo.createUser(user);
+      await delay(10);
       await mongo.addEmail(retUser._id, email, false);
       await mongo.removeEmail(retUser._id, user.email, false);
       retUser = await mongo.findUserById(retUser._id);
@@ -253,6 +259,7 @@ describe('Mongo', () => {
     it('should change username', async () => {
       const username = 'johnsdoe';
       let retUser = await mongo.createUser(user);
+      await delay(10);
       await mongo.setUsername(retUser._id, username);
       retUser = await mongo.findUserById(retUser._id);
       expect(retUser.username).toEqual(username);
@@ -273,6 +280,7 @@ describe('Mongo', () => {
     it('should change password', async () => {
       const newPassword = 'newpass';
       let retUser = await mongo.createUser(user);
+      await delay(10);
       await mongo.setPasssword(retUser._id, newPassword);
       retUser = await mongo.findUserById(retUser._id);
       expect(retUser.services.password.bcrypt).toBeTruthy();
@@ -311,6 +319,7 @@ describe('Mongo', () => {
   describe('updateSession', () => {
     it('should update session', async () => {
       const retSession = await mongo.createSession(session.userId, session.ip, session.userAgent);
+      await delay(10);
       await mongo.updateSession(retSession._id, 'new ip', 'new user agent');
       const ret = await mongo.findSessionById(retSession._id);
       expect(ret.userId).toEqual(session.userId);
@@ -326,6 +335,7 @@ describe('Mongo', () => {
   describe('invalidateSession', () => {
     it('invalidates a session', async () => {
       const retSession = await mongo.createSession(session.userId, session.ip, session.userAgent);
+      await delay(10);
       await mongo.invalidateSession(retSession._id);
       const ret = await mongo.findSessionById(retSession._id);
       expect(ret.valid).toEqual(false);
