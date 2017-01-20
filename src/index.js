@@ -127,7 +127,6 @@ class Mongo {
   }
 
   async setPasssword(userId: string, newPassword: string): Promise<void> {
-    // TODO hash newPassword
     const ret = await this.collection.update({ _id: userId }, {
       $set: { 'services.password.bcrypt': await encryption.hashPassword(newPassword) },
     });
