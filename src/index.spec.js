@@ -88,7 +88,8 @@ describe('Mongo', () => {
 
   describe('createUser', () => {
     it('should create a new user', async () => {
-      const ret = await mongo.createUser(user);
+      const userId = await mongo.createUser(user);
+      const ret = await mongo.findUserById(userId);
       expect(ret._id).toBeTruthy();
       expect(ret.emails[0].address).toBe(user.email);
       expect(ret.emails[0].verified).toBe(false);
@@ -97,25 +98,29 @@ describe('Mongo', () => {
     });
 
     it('should not set password', async () => {
-      const ret = await mongo.createUser({ email: user.email });
+      const userId = await mongo.createUser({ email: user.email });
+      const ret = await mongo.findUserById(userId);
       expect(ret._id).toBeTruthy();
       expect(ret.services.password).not.toBeTruthy();
     });
 
     it('should not set username', async () => {
-      const ret = await mongo.createUser({ email: user.email });
+      const userId = await mongo.createUser({ email: user.email });
+      const ret = await mongo.findUserById(userId);
       expect(ret._id).toBeTruthy();
       expect(ret.username).not.toBeTruthy();
     });
 
     it('should not set email', async () => {
-      const ret = await mongo.createUser({ username: user.username });
+      const userId = await mongo.createUser({ username: user.username });
+      const ret = await mongo.findUserById(userId);
       expect(ret._id).toBeTruthy();
       expect(ret.emails).not.toBeTruthy();
     });
 
     it('email should be lowercase', async () => {
-      const ret = await mongo.createUser({ email: 'JohN@doe.com' });
+      const userId = await mongo.createUser({ email: 'JohN@doe.com' });
+      const ret = await mongo.findUserById(userId);
       expect(ret._id).toBeTruthy();
       expect(ret.emails[0].address).toEqual('john@doe.com');
     });
@@ -128,8 +133,8 @@ describe('Mongo', () => {
     });
 
     it('should return user', async () => {
-      const retUser = await mongo.createUser(user);
-      const ret = await mongo.findUserById(retUser._id);
+      const userId = await mongo.createUser(user);
+      const ret = await mongo.findUserById(userId);
       expect(ret).toBeTruthy();
     });
   });
@@ -172,8 +177,9 @@ describe('Mongo', () => {
     });
 
     it('should return hash', async () => {
-      const retUser = await mongo.createUser(user);
-      const ret = await mongo.findPasswordHash(retUser._id);
+      const userId = await mongo.createUser(user);
+      const retUser = await mongo.findUserById(userId);
+      const ret = await mongo.findPasswordHash(userId);
       expect(ret).toBeTruthy();
       expect(ret).toEqual(retUser.services.password.bcrypt);
     });
@@ -191,19 +197,19 @@ describe('Mongo', () => {
 
     it('should add email', async () => {
       const email = 'johns@doe.com';
-      let retUser = await mongo.createUser(user);
+      const userId = await mongo.createUser(user);
       await delay(10);
-      await mongo.addEmail(retUser._id, email, false);
-      retUser = await mongo.findUserByEmail(email);
+      await mongo.addEmail(userId, email, false);
+      const retUser = await mongo.findUserByEmail(email);
       expect(retUser.emails.length).toEqual(2);
       expect(retUser.createdAt).not.toEqual(retUser.updatedAt);
     });
 
     it('should add lowercase email', async () => {
       const email = 'johnS@doe.com';
-      let retUser = await mongo.createUser(user);
-      await mongo.addEmail(retUser._id, email, false);
-      retUser = await mongo.findUserByEmail(email);
+      const userId = await mongo.createUser(user);
+      await mongo.addEmail(userId, email, false);
+      const retUser = await mongo.findUserByEmail(email);
       expect(retUser.emails.length).toEqual(2);
       expect(retUser.emails[1].address).toEqual('johns@doe.com');
     });
@@ -221,11 +227,11 @@ describe('Mongo', () => {
 
     it('should remove email', async () => {
       const email = 'johns@doe.com';
-      let retUser = await mongo.createUser(user);
+      const userId = await mongo.createUser(user);
       await delay(10);
-      await mongo.addEmail(retUser._id, email, false);
-      await mongo.removeEmail(retUser._id, user.email, false);
-      retUser = await mongo.findUserById(retUser._id);
+      await mongo.addEmail(userId, email, false);
+      await mongo.removeEmail(userId, user.email, false);
+      const retUser = await mongo.findUserById(userId);
       expect(retUser.emails.length).toEqual(1);
       expect(retUser.emails[0].address).toEqual(email);
       expect(retUser.createdAt).not.toEqual(retUser.updatedAt);
@@ -233,10 +239,10 @@ describe('Mongo', () => {
 
     it('should remove uppercase email', async () => {
       const email = 'johns@doe.com';
-      let retUser = await mongo.createUser(user);
-      await mongo.addEmail(retUser._id, email, false);
-      await mongo.removeEmail(retUser._id, 'JOHN@doe.com', false);
-      retUser = await mongo.findUserById(retUser._id);
+      const userId = await mongo.createUser(user);
+      await mongo.addEmail(userId, email, false);
+      await mongo.removeEmail(userId, 'JOHN@doe.com', false);
+      const retUser = await mongo.findUserById(userId);
       expect(retUser.emails.length).toEqual(1);
       expect(retUser.emails[0].address).toEqual(email);
     });
@@ -254,10 +260,10 @@ describe('Mongo', () => {
 
     it('should change username', async () => {
       const username = 'johnsdoe';
-      let retUser = await mongo.createUser(user);
+      const userId = await mongo.createUser(user);
       await delay(10);
-      await mongo.setUsername(retUser._id, username);
-      retUser = await mongo.findUserById(retUser._id);
+      await mongo.setUsername(userId, username);
+      const retUser = await mongo.findUserById(userId);
       expect(retUser.username).toEqual(username);
       expect(retUser.createdAt).not.toEqual(retUser.updatedAt);
     });
@@ -275,10 +281,10 @@ describe('Mongo', () => {
 
     it('should change password', async () => {
       const newPassword = 'newpass';
-      let retUser = await mongo.createUser(user);
+      const userId = await mongo.createUser(user);
       await delay(10);
-      await mongo.setPasssword(retUser._id, newPassword);
-      retUser = await mongo.findUserById(retUser._id);
+      await mongo.setPasssword(userId, newPassword);
+      const retUser = await mongo.findUserById(userId);
       expect(retUser.services.password.bcrypt).toBeTruthy();
       expect(retUser.services.password.bcrypt).not.toEqual(newPassword);
       expect(retUser.createdAt).not.toEqual(retUser.updatedAt);
@@ -287,7 +293,8 @@ describe('Mongo', () => {
 
   describe('createSession', () => {
     it('should create session', async () => {
-      const ret = await mongo.createSession(session.userId, session.ip, session.userAgent);
+      const sessionId = await mongo.createSession(session.userId, session.ip, session.userAgent);
+      const ret = await mongo.findSessionById(sessionId);
       expect(ret).toBeTruthy();
       expect(ret._id).toBeTruthy();
       expect(ret.userId).toEqual(session.userId);
@@ -306,18 +313,18 @@ describe('Mongo', () => {
     });
 
     it('should find session', async () => {
-      const retSession = await mongo.createSession(session);
-      const ret = await mongo.findSessionById(retSession._id);
+      const sessionId = await mongo.createSession(session);
+      const ret = await mongo.findSessionById(sessionId);
       expect(ret).toBeTruthy();
     });
   });
 
   describe('updateSession', () => {
     it('should update session', async () => {
-      const retSession = await mongo.createSession(session.userId, session.ip, session.userAgent);
+      const sessionId = await mongo.createSession(session.userId, session.ip, session.userAgent);
       await delay(10);
-      await mongo.updateSession(retSession._id, 'new ip', 'new user agent');
-      const ret = await mongo.findSessionById(retSession._id);
+      await mongo.updateSession(sessionId, 'new ip', 'new user agent');
+      const ret = await mongo.findSessionById(sessionId);
       expect(ret.userId).toEqual(session.userId);
       expect(ret.ip).toEqual('new ip');
       expect(ret.userAgent).toEqual('new user agent');
@@ -330,10 +337,10 @@ describe('Mongo', () => {
 
   describe('invalidateSession', () => {
     it('invalidates a session', async () => {
-      const retSession = await mongo.createSession(session.userId, session.ip, session.userAgent);
+      const sessionId = await mongo.createSession(session.userId, session.ip, session.userAgent);
       await delay(10);
-      await mongo.invalidateSession(retSession._id);
-      const ret = await mongo.findSessionById(retSession._id);
+      await mongo.invalidateSession(sessionId);
+      const ret = await mongo.findSessionById(sessionId);
       expect(ret.valid).toEqual(false);
       expect(ret.createdAt).not.toEqual(ret.updatedAt);
     });

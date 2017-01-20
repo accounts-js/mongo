@@ -61,7 +61,7 @@ class Mongo {
     await this.collection.createIndex('emails.address', { unique: 1, sparse: 1 });
   }
 
-  async createUser(options: CreateUserType): Promise<UserObjectType> {
+  async createUser(options: CreateUserType): Promise<string> {
     const user: MongoUserObjectType = {
       services: {},
       [this.options.timestamps.createdAt]: Date.now(),
@@ -77,7 +77,7 @@ class Mongo {
       user.emails = [{ address: options.email.toLowerCase(), verified: false }];
     }
     const ret = await this.collection.insertOne(user);
-    return ret.ops[0];
+    return ret.ops[0]._id;
   }
 
   findUserById(userId: string): Promise<?UserObjectType> {
@@ -149,7 +149,7 @@ class Mongo {
     }
   }
 
-  async createSession(userId: string, ip: string, userAgent: string): Promise<SessionType> {
+  async createSession(userId: string, ip: string, userAgent: string): Promise<string> {
     const ret = await this.sessionCollection.insertOne({
       userId,
       userAgent,
@@ -158,7 +158,7 @@ class Mongo {
       [this.options.timestamps.createdAt]: Date.now(),
       [this.options.timestamps.updatedAt]: Date.now(),
     });
-    return ret.ops[0];
+    return ret.ops[0]._id;
   }
 
   async updateSession(sessionId: string, ip: string, userAgent: string): Promise<void> {
