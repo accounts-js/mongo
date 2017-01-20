@@ -106,6 +106,7 @@ class Mongo {
           verified,
         },
       },
+      $set: { [this.options.timestamps.updatedAt]: Date.now() },
     });
     if (ret.result.nModified === 0) {
       throw new Error('User not found');
@@ -115,6 +116,7 @@ class Mongo {
   async removeEmail(userId: string, email: string): Promise<void> {
     const ret = await this.collection.update({ _id: userId }, {
       $pull: { emails: { address: email.toLowerCase() } },
+      $set: { [this.options.timestamps.updatedAt]: Date.now() },
     });
     if (ret.result.nModified === 0) {
       throw new Error('User not found');
@@ -123,7 +125,10 @@ class Mongo {
 
   async setUsername(userId: string, newUsername: string): Promise<void> {
     const ret = await this.collection.update({ _id: userId }, {
-      $set: { username: newUsername },
+      $set: {
+        username: newUsername,
+        [this.options.timestamps.updatedAt]: Date.now(),
+      },
     });
     if (ret.result.nModified === 0) {
       throw new Error('User not found');
@@ -132,7 +137,10 @@ class Mongo {
 
   async setPasssword(userId: string, newPassword: string): Promise<void> {
     const ret = await this.collection.update({ _id: userId }, {
-      $set: { 'services.password.bcrypt': await encryption.hashPassword(newPassword) },
+      $set: {
+        'services.password.bcrypt': await encryption.hashPassword(newPassword),
+        [this.options.timestamps.updatedAt]: Date.now(),
+      },
     });
     if (ret.result.nModified === 0) {
       throw new Error('User not found');

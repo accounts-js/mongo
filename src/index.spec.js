@@ -195,6 +195,7 @@ describe('Mongo', () => {
       await mongo.addEmail(retUser._id, email, false);
       retUser = await mongo.findUserByEmail(email);
       expect(retUser.emails.length).toEqual(2);
+      expect(retUser.createdAt).not.toEqual(retUser.updatedAt);
     });
 
     it('should add lowercase email', async () => {
@@ -225,6 +226,7 @@ describe('Mongo', () => {
       retUser = await mongo.findUserById(retUser._id);
       expect(retUser.emails.length).toEqual(1);
       expect(retUser.emails[0].address).toEqual(email);
+      expect(retUser.createdAt).not.toEqual(retUser.updatedAt);
     });
 
     it('should remove uppercase email', async () => {
@@ -254,6 +256,7 @@ describe('Mongo', () => {
       await mongo.setUsername(retUser._id, username);
       retUser = await mongo.findUserById(retUser._id);
       expect(retUser.username).toEqual(username);
+      expect(retUser.createdAt).not.toEqual(retUser.updatedAt);
     });
   });
 
@@ -274,6 +277,7 @@ describe('Mongo', () => {
       retUser = await mongo.findUserById(retUser._id);
       expect(retUser.services.password.bcrypt).toBeTruthy();
       expect(retUser.services.password.bcrypt).not.toEqual(newPassword);
+      expect(retUser.createdAt).not.toEqual(retUser.updatedAt);
     });
   });
 
