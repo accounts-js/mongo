@@ -10,6 +10,7 @@ import type {
 
 export type MongoOptionsType = {
   collectionName: string,
+  sessionCollectionName: string,
   timestamps: {
     createdAt: string,
     updatedAt: string,
@@ -35,6 +36,7 @@ class Mongo {
   // TODO definition for mongodb connection object
   db: any;
   collection: any;
+  sessionCollection: any;
 
   constructor(db: any, options: MongoOptionsType) {
     const defaultOptions = {
