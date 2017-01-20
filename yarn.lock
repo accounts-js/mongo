@@ -2,18 +2,18 @@
 # yarn lockfile v1
 
 
-"@accounts/common@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@accounts/common/-/common-0.0.1.tgz#47a4eaa02d765e5a000734bde4b8d5bd63f669ec"
+"@accounts/common@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@accounts/common/-/common-0.0.2.tgz#be040983e5d36b6ce0471dc3c85502274a8792de"
   dependencies:
     apollo-errors "^1.2.1"
     lodash "^4.16.4"
 
-"@accounts/server@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@accounts/server/-/server-0.0.1.tgz#39283fdad1d96eee02e657bfdc12d3eb1b8c9a92"
+"@accounts/server@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@accounts/server/-/server-0.0.2.tgz#d4bd5c2171a43fa86c0b623e9a940f1e102e5091"
   dependencies:
-    "@accounts/common" "^0.0.1"
+    "@accounts/common" "^0.0.2"
     apollo-errors "^1.2.1"
     bcryptjs "^2.4.0"
     jsonwebtoken "^7.2.1"

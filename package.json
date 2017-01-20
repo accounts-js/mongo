@@ -53,8 +53,8 @@
     "webpack-node-externals": "^1.5.4"
   },
   "dependencies": {
-    "@accounts/common": "^0.0.1",
-    "@accounts/server": "^0.0.1",
+    "@accounts/common": "^0.0.2",
+    "@accounts/server": "^0.0.2",
     "lodash": "^4.17.3",
     "mongodb": "^2.2.16"
   }
