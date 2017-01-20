@@ -5,6 +5,7 @@ import { encryption } from '@accounts/server';
 import type {
   CreateUserType,
   UserObjectType,
+  SessionType,
 } from '@accounts/common';
 
 export type MongoOptionsType = {
@@ -38,6 +39,7 @@ class Mongo {
   constructor(db: any, options: MongoOptionsType) {
     const defaultOptions = {
       collectionName: 'users',
+      sessionCollectionName: 'sessions',
       timestamps: {
         createdAt: 'createdAt',
         updatedAt: 'updatedAt',
@@ -49,6 +51,7 @@ class Mongo {
     }
     this.db = db;
     this.collection = this.db.collection(this.options.collectionName);
+    this.sessionCollection = this.db.collection(this.options.sessionCollectionName);
   }
 
   async setupIndexes(): Promise<void> {
@@ -60,6 +63,7 @@ class Mongo {
     const user: MongoUserObjectType = {
       services: {},
       [this.options.timestamps.createdAt]: Date.now(),
+      [this.options.timestamps.updatedAt]: Date.now(),
     };
     if (options.password) {
       user.services.password = { bcrypt: await encryption.hashPassword(options.password) };
@@ -133,6 +137,41 @@ class Mongo {
     if (ret.result.nModified === 0) {
       throw new Error('User not found');
     }
+  }
+
+  async createSession(userId: string, ip: string, userAgent: string): Promise<SessionType> {
+    const ret = await this.sessionCollection.insertOne({
+      userId,
+      userAgent,
+      ip,
+      valid: true,
+      [this.options.timestamps.createdAt]: Date.now(),
+      [this.options.timestamps.updatedAt]: Date.now(),
+    });
+    return ret.ops[0];
+  }
+
+  async updateSession(sessionId: string, ip: string, userAgent: string): Promise<void> {
+    await this.sessionCollection.update({ _id: sessionId }, {
+      $set: {
+        ip,
+        userAgent,
+        [this.options.timestamps.updatedAt]: Date.now(),
+      },
+    });
+  }
+
+  async invalidateSession(sessionId: string): Promise<void> {
+    await this.sessionCollection.update({ _id: sessionId }, {
+      $set: {
+        valid: false,
+        [this.options.timestamps.updatedAt]: Date.now(),
+      },
+    });
+  }
+
+  findSessionById(sessionId: string): Promise<?SessionType> {
+    return this.sessionCollection.findOne({ _id: sessionId });
   }
 }
 

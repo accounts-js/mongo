@@ -9,6 +9,11 @@ const user = {
   password: 'toto',
   profile: {},
 };
+const session = {
+  userId: '123',
+  ip: '127.0.0.1',
+  userAgent: 'user agent',
+};
 
 function createConnection(cb) {
   const url = 'mongodb://localhost:27017/accounts-mongo-tests';
@@ -45,9 +50,11 @@ describe('Mongo', () => {
     it('should overwrite options', () => {
       const mongoTestOptions = new Mongo(db, {
         collectionName: 'users-test',
+        sessionCollectionName: 'sessions-test',
       });
       expect(mongoTestOptions.options).toBeTruthy();
       expect(mongoTestOptions.options.collectionName).toEqual('users-test');
+      expect(mongoTestOptions.options.sessionCollectionName).toEqual('sessions-test');
     });
 
     it('should throw with an invalid database connection object', () => {
@@ -82,6 +89,7 @@ describe('Mongo', () => {
       expect(ret.emails[0].address).toBe(user.email);
       expect(ret.emails[0].verified).toBe(false);
       expect(ret.createdAt).toBeTruthy();
+      expect(ret.updatedAt).toBeTruthy();
     });
 
     it('should not set password', async () => {
@@ -266,6 +274,58 @@ describe('Mongo', () => {
       retUser = await mongo.findUserById(retUser._id);
       expect(retUser.services.password.bcrypt).toBeTruthy();
       expect(retUser.services.password.bcrypt).not.toEqual(newPassword);
+    });
+  });
+
+  describe('createSession', () => {
+    it('should create session', async () => {
+      const ret = await mongo.createSession(session.userId, session.ip, session.userAgent);
+      expect(ret).toBeTruthy();
+      expect(ret._id).toBeTruthy();
+      expect(ret.userId).toEqual(session.userId);
+      expect(ret.ip).toEqual(session.ip);
+      expect(ret.userAgent).toEqual(session.userAgent);
+      expect(ret.valid).toEqual(true);
+      expect(ret.createdAt).toBeTruthy();
+      expect(ret.updatedAt).toBeTruthy();
+    });
+  });
+
+  describe('findSessionById', () => {
+    it('should return null for not found session', async () => {
+      const ret = await mongo.findSessionById('unknowsession');
+      expect(ret).not.toBeTruthy();
+    });
+
+    it('should find session', async () => {
+      const retSession = await mongo.createSession(session);
+      const ret = await mongo.findSessionById(retSession._id);
+      expect(ret).toBeTruthy();
+    });
+  });
+
+  describe('updateSession', () => {
+    it('should update session', async () => {
+      const retSession = await mongo.createSession(session.userId, session.ip, session.userAgent);
+      await mongo.updateSession(retSession._id, 'new ip', 'new user agent');
+      const ret = await mongo.findSessionById(retSession._id);
+      expect(ret.userId).toEqual(session.userId);
+      expect(ret.ip).toEqual('new ip');
+      expect(ret.userAgent).toEqual('new user agent');
+      expect(ret.valid).toEqual(true);
+      expect(ret.createdAt).toBeTruthy();
+      expect(ret.updatedAt).toBeTruthy();
+      expect(ret.createdAt).not.toEqual(ret.updatedAt);
+    });
+  });
+
+  describe('invalidateSession', () => {
+    it('invalidates a session', async () => {
+      const retSession = await mongo.createSession(session.userId, session.ip, session.userAgent);
+      await mongo.invalidateSession(retSession._id);
+      const ret = await mongo.findSessionById(retSession._id);
+      expect(ret.valid).toEqual(false);
+      expect(ret.createdAt).not.toEqual(ret.updatedAt);
     });
   });
 
