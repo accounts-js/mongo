@@ -166,13 +166,9 @@ describe('Mongo', () => {
   });
 
   describe('findPasswordHash', () => {
-    it('should throw if user is not found', async () => {
-      try {
-        await mongo.findPasswordHash('unknowuser');
-        throw new Error();
-      } catch (err) {
-        expect(err.message).toEqual('User not found');
-      }
+    it('should return null on not found user', async () => {
+      const ret = await mongo.findPasswordHash('unknowuser');
+      expect(ret).toEqual(null);
     });
 
     it('should return hash', async () => {

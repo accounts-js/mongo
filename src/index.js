@@ -94,10 +94,10 @@ class Mongo {
 
   async findPasswordHash(userId: string): Promise<?string> {
     const user = await this.findUserById(userId);
-    if (!user) {
-      throw new Error('User not found');
+    if (user) {
+      return user.services.password.bcrypt;
     }
-    return user.services.password.bcrypt;
+    return null;
   }
 
   async addEmail(userId: string, newEmail: string, verified: boolean): Promise<void> {
