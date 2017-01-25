@@ -248,6 +248,28 @@ describe('Mongo', () => {
     });
   });
 
+  describe('generateVerificationEmailToken', () => {
+    it('should throw if user is not found', async () => {
+      try {
+        await mongo.generateVerificationEmailToken('unknowuser');
+        throw new Error();
+      } catch (err) {
+        expect(err.message).toEqual('User not found');
+      }
+    });
+
+    it('should generate a new token', async () => {
+      const userId = await mongo.createUser(user);
+      await delay(10);
+      await mongo.generateVerificationEmailToken(userId, user.email, false);
+      const retUser = await mongo.findUserById(userId);
+      expect(retUser.services.email).toBeTruthy();
+      expect(retUser.services.email.verificationTokens[0].token).toBeTruthy();
+      expect(retUser.services.email.verificationTokens[0].address).toEqual(user.email);
+      expect(retUser.services.email.verificationTokens[0].when).toBeTruthy();
+    });
+  });
+
   describe('setUsername', () => {
     it('should throw if user is not found', async () => {
       try {

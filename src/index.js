@@ -7,6 +7,7 @@ import type {
   UserObjectType,
   SessionType,
 } from '@accounts/common';
+import crypto from 'crypto';
 
 export type MongoOptionsType = {
   collectionName: string,
@@ -119,6 +120,21 @@ class Mongo {
     const ret = await this.collection.update({ _id: userId }, {
       $pull: { emails: { address: email.toLowerCase() } },
       $set: { [this.options.timestamps.updatedAt]: Date.now() },
+    });
+    if (ret.result.nModified === 0) {
+      throw new Error('User not found');
+    }
+  }
+
+  async generateVerificationEmailToken(userId: string, email: string): Promise<void> {
+    const ret = await this.collection.update({ _id: userId }, {
+      $push: {
+        'services.email.verificationTokens': {
+          token: crypto.randomBytes(43).toString('hex'),
+          address: email,
+          when: Date.now(),
+        },
+      },
     });
     if (ret.result.nModified === 0) {
       throw new Error('User not found');
