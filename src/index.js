@@ -1,12 +1,13 @@
 // @flow
 
-import { get } from 'lodash';
+import { get, find } from 'lodash';
 import { encryption } from '@accounts/server';
 import type {
   CreateUserType,
   UserObjectType,
   SessionType,
 } from '@accounts/common';
+import crypto from 'crypto';
 
 export type MongoOptionsType = {
   collectionName: string,
@@ -127,6 +128,41 @@ class Mongo {
     if (ret.result.nModified === 0) {
       throw new Error('User not found');
     }
+  }
+
+  async generateVerificationEmailToken(userId: string, email: string): Promise<void> {
+    const ret = await this.collection.update({ _id: userId }, {
+      $push: {
+        'services.email.verificationTokens': {
+          token: crypto.randomBytes(43).toString('hex'),
+          address: email.toLowerCase(),
+          when: Date.now(),
+        },
+      },
+    });
+    if (ret.result.nModified === 0) {
+      throw new Error('User not found');
+    }
+  }
+
+  async verifyEmail(token: string): Promise<void> {
+    const user = await this.collection.findOne({ 'services.email.verificationTokens.token': token });
+    if (!user) {
+      throw new Error('Verify email link expired');
+    }
+    const tokenRecord = find(user.services.email.verificationTokens, t => t.token === token);
+    if (!tokenRecord) {
+      throw new Error('Verify email link expired');
+    }
+    const emailsRecord = find(user.emails, e => e.address === tokenRecord.address);
+    if (!emailsRecord) {
+      throw new Error('Verify email link is for unknown address');
+    }
+    // TODO check expiration date
+    await this.collection.update({ _id: user._id, 'emails.address': tokenRecord.address }, {
+      $set: { 'emails.$.verified': true },
+      $pull: { 'services.email.verificationTokens': { address: tokenRecord.address } },
+    });
   }
 
   async setUsername(userId: string, newUsername: string): Promise<void> {

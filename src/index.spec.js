@@ -251,6 +251,60 @@ describe('Mongo', () => {
     });
   });
 
+  describe('generateVerificationEmailToken', () => {
+    it('should throw if user is not found', async () => {
+      try {
+        await mongo.generateVerificationEmailToken('unknowuser', '');
+        throw new Error();
+      } catch (err) {
+        expect(err.message).toEqual('User not found');
+      }
+    });
+
+    it('should generate a new token', async () => {
+      const userId = await mongo.createUser(user);
+      await mongo.generateVerificationEmailToken(userId, user.email);
+      const retUser = await mongo.findUserById(userId);
+      expect(retUser.services.email).toBeTruthy();
+      expect(retUser.services.email.verificationTokens[0].token).toBeTruthy();
+      expect(retUser.services.email.verificationTokens[0].address).toEqual(user.email);
+      expect(retUser.services.email.verificationTokens[0].when).toBeTruthy();
+    });
+  });
+
+  describe('verifyEmail', () => {
+    it('should throw with invalid token', async () => {
+      try {
+        await mongo.verifyEmail('unknowtoken');
+        throw new Error();
+      } catch (err) {
+        expect(err.message).toEqual('Verify email link expired');
+      }
+    });
+
+    it('should throw with invalid email', async () => {
+      try {
+        const email = 'johns@doe.com';
+        const userId = await mongo.createUser(user);
+        await mongo.generateVerificationEmailToken(userId, email);
+        const retUser = await mongo.findUserById(userId);
+        await mongo.verifyEmail(retUser.services.email.verificationTokens[0].token);
+        throw new Error();
+      } catch (err) {
+        expect(err.message).toEqual('Verify email link is for unknown address');
+      }
+    });
+
+    it('should verify email', async () => {
+      const userId = await mongo.createUser(user);
+      await mongo.generateVerificationEmailToken(userId, user.email);
+      let retUser = await mongo.findUserById(userId);
+      await mongo.verifyEmail(retUser.services.email.verificationTokens[0].token);
+      retUser = await mongo.findUserById(userId);
+      expect(retUser.emails[0].verified).toEqual(true);
+    });
+  });
+
   describe('setUsername', () => {
     it('should throw if user is not found', async () => {
       try {
