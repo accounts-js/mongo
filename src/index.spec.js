@@ -131,7 +131,7 @@ describe('Mongo', () => {
 
   describe('findUserById', () => {
     it('should return null for not found user', async () => {
-      const ret = await mongo.findUserById('unknowuser');
+      const ret = await mongo.findUserById('589871d1c9393d445745a57c');
       expect(ret).not.toBeTruthy();
     });
 
@@ -175,7 +175,7 @@ describe('Mongo', () => {
 
   describe('findPasswordHash', () => {
     it('should return null on not found user', async () => {
-      const ret = await mongo.findPasswordHash('unknowuser');
+      const ret = await mongo.findPasswordHash('589871d1c9393d445745a57c');
       expect(ret).toEqual(null);
     });
 
@@ -191,7 +191,7 @@ describe('Mongo', () => {
   describe('addEmail', () => {
     it('should throw if user is not found', async () => {
       try {
-        await mongo.addEmail('unknowuser', 'unknowemail');
+        await mongo.addEmail('589871d1c9393d445745a57c', 'unknowemail');
         throw new Error();
       } catch (err) {
         expect(err.message).toEqual('User not found');
@@ -221,7 +221,7 @@ describe('Mongo', () => {
   describe('removeEmail', () => {
     it('should throw if user is not found', async () => {
       try {
-        await mongo.removeEmail('unknowuser', 'unknowemail');
+        await mongo.removeEmail('589871d1c9393d445745a57c', 'unknowemail');
         throw new Error();
       } catch (err) {
         expect(err.message).toEqual('User not found');
@@ -254,7 +254,7 @@ describe('Mongo', () => {
   describe('setUsername', () => {
     it('should throw if user is not found', async () => {
       try {
-        await mongo.setUsername('unknowuser');
+        await mongo.setUsername('589871d1c9393d445745a57c');
         throw new Error();
       } catch (err) {
         expect(err.message).toEqual('User not found');
@@ -275,7 +275,7 @@ describe('Mongo', () => {
   describe('setPasssword', () => {
     it('should throw if user is not found', async () => {
       try {
-        await mongo.setPasssword('unknowuser', 'toto');
+        await mongo.setPasssword('589871d1c9393d445745a57c', 'toto');
         throw new Error();
       } catch (err) {
         expect(err.message).toEqual('User not found');
@@ -320,7 +320,7 @@ describe('Mongo', () => {
 
   describe('findSessionById', () => {
     it('should return null for not found session', async () => {
-      const ret = await mongo.findSessionById('unknowsession');
+      const ret = await mongo.findSessionById('589871d1c9393d445745a57c');
       expect(ret).not.toBeTruthy();
     });
 
@@ -356,6 +356,10 @@ describe('Mongo', () => {
       expect(ret.valid).toEqual(false);
       expect(ret.createdAt).not.toEqual(ret.updatedAt);
     });
+  });
+
+  afterAll((done) => {
+    dropDatabase(done);
   });
 
   afterAll(closeConnection);
