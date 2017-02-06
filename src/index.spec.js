@@ -358,9 +358,5 @@ describe('Mongo', () => {
     });
   });
 
-  afterAll((done) => {
-    dropDatabase(done);
-  });
-
   afterAll(closeConnection);
 });
