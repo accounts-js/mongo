@@ -7,7 +7,7 @@ import type {
   UserObjectType,
   SessionType,
 } from '@accounts/common';
-import {ObjectID} from 'mongodb';
+import { ObjectID } from 'mongodb';
 
 export type MongoOptionsType = {
   collectionName: string,
