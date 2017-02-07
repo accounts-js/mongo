@@ -49,6 +49,20 @@ function delay(time) {
 describe('Mongo', () => {
   beforeAll(createConnection);
 
+  describe('toMongoID', () => {
+    it('should not throw when mongo id is valid', () => {
+      expect(async () => {
+        await mongo.findUserById('589871d1c9393d445745a57c');
+      }).not.toThrow();
+    });
+
+    it('should throw when mongo id is not valid', () => {
+      expect(() => {
+        mongo.findUserById('invalid_hex');
+      }).toThrow();
+    });
+  });
+
   describe('#constructor', () => {
     it('should have default options', () => {
       expect(mongo.options).toBeTruthy();
@@ -169,6 +183,7 @@ describe('Mongo', () => {
 
     it('should return user', async () => {
       const ret = await mongo.findUserByUsername(user.username);
+      await delay(10);
       expect(ret).toBeTruthy();
     });
   });
