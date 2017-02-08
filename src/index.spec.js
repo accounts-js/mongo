@@ -153,6 +153,8 @@ describe('Mongo', () => {
       const userId = await mongo.createUser(user);
       const ret = await mongo.findUserById(userId);
       expect(ret).toBeTruthy();
+      expect(ret._id).toBeTruthy();
+      expect(ret.id).toBeTruthy();
     });
   });
 
@@ -165,6 +167,8 @@ describe('Mongo', () => {
     it('should return user', async () => {
       const ret = await mongo.findUserByEmail(user.email);
       expect(ret).toBeTruthy();
+      expect(ret._id).toBeTruthy();
+      expect(ret.id).toBeTruthy();
     });
 
     it('should return user with uppercase email', async () => {
@@ -185,6 +189,8 @@ describe('Mongo', () => {
       const ret = await mongo.findUserByUsername(user.username);
       await delay(10);
       expect(ret).toBeTruthy();
+      expect(ret._id).toBeTruthy();
+      expect(ret.id).toBeTruthy();
     });
   });
 
