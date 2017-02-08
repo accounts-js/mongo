@@ -56,10 +56,13 @@ describe('Mongo', () => {
       }).not.toThrow();
     });
 
-    it('should throw when mongo id is not valid', () => {
-      expect(() => {
-        mongo.findUserById('invalid_hex');
-      }).toThrow();
+    it('should throw when mongo id is not valid', async () => {
+      try {
+        await mongo.findUserById('invalid_hex');
+        throw new Error();
+      } catch (err) {
+        expect(err.message).toEqual('Argument passed in must be a single String of 12 bytes or a string of 24 hex characters');
+      }
     });
   });
 
