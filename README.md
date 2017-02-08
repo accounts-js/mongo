@@ -19,15 +19,15 @@ yarn add @accounts/mongo
 import AccountsServer from '@accounts/server';
 import MongoDBInterface from '@accounts/mongo';
 
-# If you are using mongoose
+// If you are using mongoose
 mongoose.connect(process.env.MONGO_URL);
 const db = mongoose.connection;
 
-# If you are using mongodb
+// If you are using mongodb
 const db =  await mongodb.MongoClient.connect(process.env.MONGO_URL);
 
 AccountsServer.config({
 }, new MongoDBInterface(db));
 ```
 
-The users will be saved under the `users` table.
+The users will be saved under the `users` collection.
