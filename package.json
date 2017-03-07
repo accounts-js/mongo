@@ -55,11 +55,13 @@
     "flow-bin": "^0.38.0",
     "jest": "^18.1.0",
     "webpack": "^1.14.0",
-    "webpack-node-externals": "^1.5.4"
+    "webpack-node-externals": "^1.5.4",
+    "@accounts/common": "^0.0.8",
+    "@accounts/server": "^0.0.8"
   },
   "peerDependencies": {
-    "@accounts/common": "^0.0.6",
-    "@accounts/server": "^0.0.6"
+    "@accounts/common": "*",
+    "@accounts/server": "*"
   },
   "dependencies": {
     "lodash": "^4.17.4",
