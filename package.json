@@ -56,12 +56,12 @@
     "jest": "^18.1.0",
     "webpack": "^1.14.0",
     "webpack-node-externals": "^1.5.4",
-    "@accounts/common": "^0.0.8",
-    "@accounts/server": "^0.0.8"
+    "@accounts/common": "^0.0.9",
+    "@accounts/server": "^0.0.9"
   },
   "peerDependencies": {
-    "@accounts/common": "*",
-    "@accounts/server": "*"
+    "@accounts/common": "^0.0.9",
+    "@accounts/server": "^0.0.9"
   },
   "dependencies": {
     "lodash": "^4.17.4",
