@@ -194,7 +194,7 @@ class Mongo {
         [this.options.timestamps.updatedAt]: Date.now(),
       },
       $unset: {
-        reset: true,
+        'services.password.reset': '',
       },
     });
     if (ret.result.nModified === 0) {
