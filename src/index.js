@@ -7,6 +7,7 @@ import type {
   SessionType,
 } from '@accounts/common';
 import { ObjectID } from 'mongodb';
+import get from 'lodash/get';
 
 export type MongoOptionsType = {
   collectionName: string,
@@ -141,7 +142,7 @@ class Mongo {
     const id = this.options.convertUserIdToMongoObjectId ? toMongoID(userId) : userId;
     const user = await this.findUserById(id);
     if (user) {
-      return user.services && user.services.password.bcrypt;
+      return get(user, 'services.password.bcrypt');
     }
     return null;
   }
