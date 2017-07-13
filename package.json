@@ -41,6 +41,7 @@
   "homepage": "https://github.com/js-accounts/mongo",
   "devDependencies": {
     "@accounts/server": "^0.0.17",
+    "@accounts/tslint-config-accounts": "^0.0.4",
     "@types/jest": "^20.0.2",
     "@types/mongodb": "^2.2.7",
     "@types/node": "^8.0.10",
@@ -49,7 +50,6 @@
     "prettier": "^1.5.2",
     "ts-jest": "^20.0.7",
     "tslint": "^5.5.0",
-    "tslint-config-accounts": "^0.0.3",
     "typescript": "^2.4.1"
   },
   "peerDependencies": {
