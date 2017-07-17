@@ -407,6 +407,26 @@ describe('Mongo', () => {
       expect(ret.updatedAt).toBeTruthy();
     });
 
+    it('should create session with extra data', async () => {
+      const impersonatorUserId = '789';
+      const sessionId = await mongo.createSession(session.userId,
+                                                  session.ip,
+                                                  session.userAgent,
+                                                  { impersonatorUserId });
+      const ret = await mongo.findSessionById(sessionId);
+      expect(ret).toBeTruthy();
+      expect(ret._id).toBeTruthy();
+      expect(ret.userId).toEqual(session.userId);
+      expect(ret.ip).toEqual(session.ip);
+      expect(ret.userAgent).toEqual(session.userAgent);
+      expect(ret.valid).toEqual(true);
+      expect(ret.createdAt).toBeTruthy();
+      expect(ret.createdAt).toEqual(new Date(ret.createdAt).getTime());
+      expect(ret.updatedAt).toBeTruthy();
+      expect(ret.extraData).toBeTruthy();
+      expect(ret.extraData).toEqual({ impersonatorUserId });
+    });
+
     it('using date provider on create session', async () => {
       const mongoTestOptions = new Mongo(db, {
         dateProvider: (() => new Date()),
