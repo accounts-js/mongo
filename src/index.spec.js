@@ -420,9 +420,7 @@ describe('Mongo', () => {
       expect(ret.ip).toEqual(session.ip);
       expect(ret.userAgent).toEqual(session.userAgent);
       expect(ret.valid).toEqual(true);
-      expect(ret.createdAt).toBeTruthy();
       expect(ret.createdAt).toEqual(new Date(ret.createdAt).getTime());
-      expect(ret.updatedAt).toBeTruthy();
       expect(ret.extraData).toBeTruthy();
       expect(ret.extraData).toEqual({ impersonatorUserId });
     });
