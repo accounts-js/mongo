@@ -10,10 +10,14 @@ export interface MongoOptionsType {
     updatedAt: string;
   };
   convertUserIdToMongoObjectId?: boolean;
+  convertSessionIdToMongoObjectId?: boolean;
   caseSensitiveUserName?: boolean;
+  idProvider?: () => string | object;
+  dateProvider?: (date?: Date) => any;
 }
 
 export interface MongoUserObjectType {
+  _id?: string | object;
   username?: string;
   profile?: object;
   services: {
@@ -44,7 +48,10 @@ const defaultOptions = {
     updatedAt: 'updatedAt',
   },
   convertUserIdToMongoObjectId: true,
+  convertSessionIdToMongoObjectId: true,
   caseSensitiveUserName: true,
+  idProvider: null,
+  dateProvider: (date?: Date) => (date ? date.getTime() : Date.now()),
 };
 
 export default class Mongo {
@@ -95,6 +102,9 @@ export default class Mongo {
     }
     if (options.profile) {
       user.profile = options.profile;
+    }
+    if (options.idProvider) {
+      user._id = options.idProvider();
     }
     const ret = await this.collection.insertOne(user);
     return ret.ops[0]._id;
@@ -272,17 +282,25 @@ export default class Mongo {
 
   public async createSession(
     userId: string,
-    ip: string,
-    userAgent: string
+    ip?: string,
+    userAgent?: string,
+    extraData?: object
   ): Promise<string> {
-    const ret = await this.sessionCollection.insertOne({
+    const session = {
       userId,
       userAgent,
       ip,
+      extraData,
       valid: true,
-      [this.options.timestamps.createdAt]: Date.now(),
-      [this.options.timestamps.updatedAt]: Date.now(),
-    });
+      [this.options.timestamps.createdAt]: this.options.dateProvider(),
+      [this.options.timestamps.updatedAt]: this.options.dateProvider(),
+    };
+    
+    if (this.options.idProvider) {
+      session._id = this.options.idProvider();
+    }
+    
+    const ret = await this.sessionCollection.insertOne(session);
     return ret.ops[0]._id;
   }
 
@@ -291,25 +309,29 @@ export default class Mongo {
     ip: string,
     userAgent: string
   ): Promise<void> {
+    // tslint:disable-next-line variable-name
+    const _id = this.options.convertSessionIdToMongoObjectId ? toMongoID(sessionId) : sessionId;    
     await this.sessionCollection.update(
-      { _id: toMongoID(sessionId) },
+      { _id },
       {
         $set: {
           ip,
           userAgent,
-          [this.options.timestamps.updatedAt]: Date.now(),
+          [this.options.timestamps.updatedAt]: this.options.dateProvider(),
         },
       }
     );
   }
 
   public async invalidateSession(sessionId: string): Promise<void> {
+    // tslint:disable-next-line variable-name
+    const _id = this.options.convertSessionIdToMongoObjectId ? toMongoID(sessionId) : sessionId;    
     await this.sessionCollection.update(
-      { _id: toMongoID(sessionId) },
+      { _id },
       {
         $set: {
           valid: false,
-          [this.options.timestamps.updatedAt]: Date.now(),
+          [this.options.timestamps.updatedAt]: this.options.dateProvider(),
         },
       }
     );
@@ -321,14 +343,16 @@ export default class Mongo {
       {
         $set: {
           valid: false,
-          [this.options.timestamps.updatedAt]: Date.now(),
+          [this.options.timestamps.updatedAt]: this.options.dateProvider(),
         },
       }
     );
   }
 
   public findSessionById(sessionId: string): Promise<SessionType | null> {
-    return this.sessionCollection.findOne({ _id: toMongoID(sessionId) });
+    // tslint:disable-next-line variable-name
+    const _id = this.options.convertSessionIdToMongoObjectId ? toMongoID(sessionId) : sessionId;    
+    return this.sessionCollection.findOne({ _id });
   }
 
   public async addEmailVerificationToken(
