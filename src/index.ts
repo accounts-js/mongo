@@ -295,11 +295,11 @@ export default class Mongo {
       [this.options.timestamps.createdAt]: this.options.dateProvider(),
       [this.options.timestamps.updatedAt]: this.options.dateProvider(),
     };
-    
+
     if (this.options.idProvider) {
       session._id = this.options.idProvider();
     }
-    
+
     const ret = await this.sessionCollection.insertOne(session);
     return ret.ops[0]._id;
   }
@@ -310,7 +310,9 @@ export default class Mongo {
     userAgent: string
   ): Promise<void> {
     // tslint:disable-next-line variable-name
-    const _id = this.options.convertSessionIdToMongoObjectId ? toMongoID(sessionId) : sessionId;    
+    const _id = this.options.convertSessionIdToMongoObjectId
+      ? toMongoID(sessionId)
+      : sessionId;
     await this.sessionCollection.update(
       { _id },
       {
@@ -325,7 +327,9 @@ export default class Mongo {
 
   public async invalidateSession(sessionId: string): Promise<void> {
     // tslint:disable-next-line variable-name
-    const _id = this.options.convertSessionIdToMongoObjectId ? toMongoID(sessionId) : sessionId;    
+    const _id = this.options.convertSessionIdToMongoObjectId
+      ? toMongoID(sessionId)
+      : sessionId;
     await this.sessionCollection.update(
       { _id },
       {
@@ -351,7 +355,9 @@ export default class Mongo {
 
   public findSessionById(sessionId: string): Promise<SessionType | null> {
     // tslint:disable-next-line variable-name
-    const _id = this.options.convertSessionIdToMongoObjectId ? toMongoID(sessionId) : sessionId;    
+    const _id = this.options.convertSessionIdToMongoObjectId
+      ? toMongoID(sessionId)
+      : sessionId;
     return this.sessionCollection.findOne({ _id });
   }
 

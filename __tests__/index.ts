@@ -426,16 +426,18 @@ describe('Mongo', () => {
       expect(ret.userAgent).toEqual(session.userAgent);
       expect(ret.valid).toEqual(true);
       expect(ret.createdAt).toBeTruthy();
-      expect(ret.createdAt).toEqual(new Date(ret.createdAt).getTime());      
+      expect(ret.createdAt).toEqual(new Date(ret.createdAt).getTime());
       expect(ret.updatedAt).toBeTruthy();
     });
-    
+
     it('should create session with extra data', async () => {
       const impersonatorUserId = '789';
-      const sessionId = await mongo.createSession(session.userId,
-                                                  session.ip,
-                                                  session.userAgent,
-                                                  { impersonatorUserId });
+      const sessionId = await mongo.createSession(
+        session.userId,
+        session.ip,
+        session.userAgent,
+        { impersonatorUserId }
+      );
       const ret = await mongo.findSessionById(sessionId);
       expect(ret).toBeTruthy();
       expect(ret._id).toBeTruthy();
@@ -447,26 +449,32 @@ describe('Mongo', () => {
       expect(ret.updatedAt).toBeTruthy();
       expect(ret.extraData).toEqual({ impersonatorUserId });
     });
-  
+
     it('using date provider on create session', async () => {
       const mongoTestOptions = new Mongo(db, {
-        dateProvider: (() => new Date()),
+        dateProvider: () => new Date(),
       });
-      const sessionId =
-          await mongoTestOptions.createSession(session.userId, session.ip, session.userAgent);
+      const sessionId = await mongoTestOptions.createSession(
+        session.userId,
+        session.ip,
+        session.userAgent
+      );
       const ret = await mongoTestOptions.findSessionById(sessionId);
       expect(ret.createdAt).toBeTruthy();
       expect(ret.createdAt).not.toEqual(new Date(ret.createdAt).getTime());
       expect(ret.createdAt).toEqual(new Date(ret.createdAt));
     });
-  
+
     it('using id provider on create session', async () => {
       const mongoTestOptions = new Mongo(db, {
         idProvider: () => new ObjectID().toHexString(),
         convertSessionIdToMongoObjectId: false,
       });
-      const sessionId =
-          await mongoTestOptions.createSession(session.userId, session.ip, session.userAgent);
+      const sessionId = await mongoTestOptions.createSession(
+        session.userId,
+        session.ip,
+        session.userAgent
+      );
       const ret = await mongoTestOptions.findSessionById(sessionId);
       expect(ret._id).toBeTruthy();
       expect(ret._id).not.toEqual(new ObjectID(ret._id));
