@@ -240,10 +240,7 @@ export default class Mongo {
     }
   }
 
-  public async setPassword(
-    userId: string,
-    newPassword: string
-  ): Promise<void> {
+  public async setPassword(userId: string, newPassword: string): Promise<void> {
     const id = this.options.convertUserIdToMongoObjectId
       ? toMongoID(userId)
       : userId;
