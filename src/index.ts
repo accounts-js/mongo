@@ -240,7 +240,7 @@ export default class Mongo {
     }
   }
 
-  public async setPasssword(
+  public async setPassword(
     userId: string,
     newPassword: string
   ): Promise<void> {
@@ -401,11 +401,11 @@ export default class Mongo {
     );
   }
 
-  public async setResetPasssword(
+  public async setResetPassword(
     userId: string,
     email: string,
     newPassword: string
   ): Promise<void> {
-    await this.setPasssword(userId, newPassword);
+    await this.setPassword(userId, newPassword);
   }
 }
