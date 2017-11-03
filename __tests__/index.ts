@@ -1,4 +1,5 @@
 import * as mongodb from 'mongodb';
+// tslint:disable-next-line
 import { ObjectID } from 'mongodb';
 import Mongo from '../src';
 
