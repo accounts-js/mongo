@@ -374,10 +374,12 @@ describe('Mongo', () => {
       const userId = await mongo.createUser(user);
       await delay(10);
       let retUser = await mongo.findUserById(userId);
+      expect(retUser.emails.length).toEqual(1);
       expect(retUser.emails[0].address).toBe(user.email);
       expect(retUser.emails[0].verified).toBe(false);
       await mongo.verifyEmail(userId, user.email);
       retUser = await mongo.findUserById(userId);
+      expect(retUser.emails.length).toEqual(1);
       expect(retUser.emails[0].address).toBe(user.email);
       expect(retUser.emails[0].verified).toBe(true);
       expect(retUser.createdAt).not.toEqual(retUser.updatedAt);
