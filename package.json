@@ -42,7 +42,8 @@
   },
   "homepage": "https://github.com/js-accounts/mongo",
   "devDependencies": {
-    "@accounts/server": "^0.0.17",
+    "@accounts/common": "^0.1.0-alpha.eae94fd8",
+    "@accounts/server": "^0.1.0-alpha.eae94fd8",
     "@accounts/tslint-config-accounts": "^0.0.4",
     "@types/jest": "^21.1.5",
     "@types/mongodb": "^2.2.15",
@@ -55,7 +56,8 @@
     "typescript": "^2.6.1"
   },
   "peerDependencies": {
-    "@accounts/server": "^0.0.10"
+    "@accounts/common": "^0.1.0",
+    "@accounts/server": "^0.1.0"
   },
   "dependencies": {
     "lodash": "^4.17.4",

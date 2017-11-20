@@ -1,6 +1,7 @@
 import { ObjectID } from 'mongodb';
 import { get } from 'lodash';
-import { CreateUserType, UserObjectType, SessionType } from '@accounts/server';
+import { CreateUserType, UserObjectType, SessionType } from '@accounts/common';
+import { DBInterface } from '@accounts/server';
 
 export interface MongoOptionsType {
   // The users collection name, default 'users'.
@@ -62,7 +63,7 @@ const defaultOptions = {
   dateProvider: (date?: Date) => (date ? date.getTime() : Date.now()),
 };
 
-export default class Mongo {
+export default class Mongo implements DBInterface {
   // Options of Mongo class
   private options: MongoOptionsType;
   // Db object
@@ -92,7 +93,8 @@ export default class Mongo {
     });
   }
 
-  public async createUser(options: CreateUserType): Promise<string> {
+  // TODO options: CreateUserType
+  public async createUser(options: any): Promise<string> {
     const user: MongoUserObjectType = {
       services: {},
       profile: {},
@@ -321,7 +323,7 @@ export default class Mongo {
     userId: string,
     serviceName: string,
     service: object
-  ): Promise<object> {
+  ): Promise<void> {
     const id = this.options.convertUserIdToMongoObjectId
       ? toMongoID(userId)
       : userId;
@@ -334,7 +336,6 @@ export default class Mongo {
         },
       }
     );
-    return service;
   }
 
   public async createSession(
