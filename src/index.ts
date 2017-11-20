@@ -337,7 +337,6 @@ export default class Mongo {
     return service;
   }
 
-
   public async createSession(
     userId: string,
     ip?: string,
