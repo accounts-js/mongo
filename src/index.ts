@@ -98,8 +98,8 @@ export default class Mongo implements DBInterface {
     const user: MongoUserObjectType = {
       services: {},
       profile: {},
-      [this.options.timestamps.createdAt]: Date.now(),
-      [this.options.timestamps.updatedAt]: Date.now(),
+      [this.options.timestamps.createdAt]: this.options.dateProvider(),
+      [this.options.timestamps.updatedAt]: this.options.dateProvider(),
     };
     if (options.password) {
       user.services.password = { bcrypt: options.password };
@@ -221,7 +221,7 @@ export default class Mongo implements DBInterface {
             verified,
           },
         },
-        $set: { [this.options.timestamps.updatedAt]: Date.now() },
+        $set: { [this.options.timestamps.updatedAt]: this.options.dateProvider() },
       }
     );
     if (ret.result.nModified === 0) {
@@ -237,7 +237,7 @@ export default class Mongo implements DBInterface {
       { _id: id },
       {
         $pull: { emails: { address: email.toLowerCase() } },
-        $set: { [this.options.timestamps.updatedAt]: Date.now() },
+        $set: { [this.options.timestamps.updatedAt]: this.options.dateProvider() },
       }
     );
     if (ret.result.nModified === 0) {
@@ -254,7 +254,7 @@ export default class Mongo implements DBInterface {
       {
         $set: {
           'emails.$.verified': true,
-          [this.options.timestamps.updatedAt]: Date.now(),
+          [this.options.timestamps.updatedAt]: this.options.dateProvider(),
         },
         $pull: { 'services.email.verificationTokens': { address: email } },
       }
@@ -273,7 +273,7 @@ export default class Mongo implements DBInterface {
       {
         $set: {
           username: newUsername,
-          [this.options.timestamps.updatedAt]: Date.now(),
+          [this.options.timestamps.updatedAt]: this.options.dateProvider(),
         },
       }
     );
@@ -291,7 +291,7 @@ export default class Mongo implements DBInterface {
       {
         $set: {
           'services.password.bcrypt': newPassword,
-          [this.options.timestamps.updatedAt]: Date.now(),
+          [this.options.timestamps.updatedAt]: this.options.dateProvider(),
         },
         $unset: {
           'services.password.reset': '',
@@ -312,7 +312,7 @@ export default class Mongo implements DBInterface {
       {
         $set: {
           profile,
-          [this.options.timestamps.updatedAt]: Date.now(),
+          [this.options.timestamps.updatedAt]: this.options.dateProvider(),
         },
       }
     );
@@ -332,7 +332,7 @@ export default class Mongo implements DBInterface {
       {
         $set: {
           [`services.${serviceName}`]: service,
-          [this.options.timestamps.updatedAt]: Date.now(),
+          [this.options.timestamps.updatedAt]: this.options.dateProvider(),
         },
       }
     );
