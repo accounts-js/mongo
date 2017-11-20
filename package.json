@@ -6,9 +6,7 @@
   "jsnext:main": "lib-es6/index.js",
   "scripts": {
     "start": "tsc --watch",
-    "compile": "npm run compile:es6 && npm run compile:umd",
-    "compile:es6": "tsc",
-    "compile:umd": "tsc",
+    "compile": "tsc",
     "test": "yarn lint && yarn coverage && yarn prettier-diff",
     "testonly": "jest",
     "lint": "tslint -c tslint.json '{src,__tests__}/**/*.ts'",
