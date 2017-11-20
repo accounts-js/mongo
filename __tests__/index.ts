@@ -282,6 +282,25 @@ describe('Mongo', () => {
     });
   });
 
+  describe('findUserByServiceId', () => {
+    it('should return null for not found user', async () => {
+      const ret = await mongo.findUserByServiceId('facebook', 'invalid');
+      expect(ret).not.toBeTruthy();
+    });
+
+    it('should return user', async () => {
+      const userId = await mongo.createUser(user);
+      let ret = await mongo.findUserByServiceId('facebook', '1');
+      expect(ret).not.toBeTruthy();
+      await mongo.setService(userId, 'facebook', { id: '1' });
+      ret = await mongo.findUserByServiceId('facebook', '1');
+      await delay(10);
+      expect(ret).toBeTruthy();
+      expect(ret._id).toBeTruthy();
+      expect(ret.id).toBeTruthy();
+    });
+  });
+
   describe('findPasswordHash', () => {
     it('should return null on not found user', async () => {
       const ret = await mongo.findPasswordHash('589871d1c9393d445745a57c');
