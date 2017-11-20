@@ -221,7 +221,9 @@ export default class Mongo implements DBInterface {
             verified,
           },
         },
-        $set: { [this.options.timestamps.updatedAt]: this.options.dateProvider() },
+        $set: {
+          [this.options.timestamps.updatedAt]: this.options.dateProvider(),
+        },
       }
     );
     if (ret.result.nModified === 0) {
@@ -237,7 +239,9 @@ export default class Mongo implements DBInterface {
       { _id: id },
       {
         $pull: { emails: { address: email.toLowerCase() } },
-        $set: { [this.options.timestamps.updatedAt]: this.options.dateProvider() },
+        $set: {
+          [this.options.timestamps.updatedAt]: this.options.dateProvider(),
+        },
       }
     );
     if (ret.result.nModified === 0) {
