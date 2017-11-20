@@ -189,6 +189,19 @@ export default class Mongo {
     return user;
   }
 
+  public async findUserByServiceId(
+    serviceName: string,
+    serviceId: string
+  ): Promise<UserObjectType | null> {
+    const user = await this.collection.findOne({
+      [`services.${serviceName}.id`]: serviceId,
+    });
+    if (user) {
+      user.id = user._id;
+    }
+    return user;
+  }
+
   public async addEmail(
     userId: string,
     newEmail: string,
@@ -303,6 +316,27 @@ export default class Mongo {
     );
     return profile;
   }
+
+  public async setService(
+    userId: string,
+    serviceName: string,
+    service: object
+  ): Promise<object> {
+    const id = this.options.convertUserIdToMongoObjectId
+      ? toMongoID(userId)
+      : userId;
+    await this.collection.update(
+      { _id: id },
+      {
+        $set: {
+          [`services.${serviceName}`]: service,
+          [this.options.timestamps.updatedAt]: Date.now(),
+        },
+      }
+    );
+    return service;
+  }
+
 
   public async createSession(
     userId: string,
