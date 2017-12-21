@@ -70,7 +70,7 @@ describe('Mongo', () => {
         throw new Error();
       } catch (err) {
         expect(err.message).toEqual(
-          'Argument passed in must be a single String of 12 bytes or a string of 24 hex characters'
+          'Argument passed in must be a single String of 12 bytes or a string of 24 hex characters',
         );
       }
     });
@@ -85,7 +85,7 @@ describe('Mongo', () => {
 
       expect(mockFindOne.mock.calls[0][0]).toHaveProperty(
         '_id',
-        '589871d1c9393d445745a57c'
+        '589871d1c9393d445745a57c',
       );
     });
   });
@@ -103,7 +103,7 @@ describe('Mongo', () => {
       expect(mongoTestOptions.options).toBeTruthy();
       expect(mongoTestOptions.options.collectionName).toEqual('users-test');
       expect(mongoTestOptions.options.sessionCollectionName).toEqual(
-        'sessions-test'
+        'sessions-test',
       );
     });
 
@@ -218,7 +218,7 @@ describe('Mongo', () => {
     it('should return username for case insensitive query', async () => {
       const mongoWithOptions = new Mongo(db, { caseSensitiveUserName: false });
       const ret = await mongoWithOptions.findUserByUsername(
-        user.username.toUpperCase()
+        user.username.toUpperCase(),
       );
       await delay(10);
       expect(ret).toBeTruthy();
@@ -462,7 +462,7 @@ describe('Mongo', () => {
       const sessionId = await mongo.createSession(
         session.userId,
         session.ip,
-        session.userAgent
+        session.userAgent,
       );
       const ret = await mongo.findSessionById(sessionId);
       expect(ret).toBeTruthy();
@@ -482,7 +482,7 @@ describe('Mongo', () => {
         session.userId,
         session.ip,
         session.userAgent,
-        { impersonatorUserId }
+        { impersonatorUserId },
       );
       const ret = await mongo.findSessionById(sessionId);
       expect(ret).toBeTruthy();
@@ -503,7 +503,7 @@ describe('Mongo', () => {
       const sessionId = await mongoTestOptions.createSession(
         session.userId,
         session.ip,
-        session.userAgent
+        session.userAgent,
       );
       const ret = await mongoTestOptions.findSessionById(sessionId);
       expect(ret.createdAt).toBeTruthy();
@@ -519,7 +519,7 @@ describe('Mongo', () => {
       const sessionId = await mongoTestOptions.createSession(
         session.userId,
         session.ip,
-        session.userAgent
+        session.userAgent,
       );
       const ret = await mongoTestOptions.findSessionById(sessionId);
       expect(ret._id).toBeTruthy();
@@ -546,7 +546,7 @@ describe('Mongo', () => {
       const sessionId = await mongo.createSession(
         session.userId,
         session.ip,
-        session.userAgent
+        session.userAgent,
       );
       await delay(10);
       await mongo.updateSession(sessionId, 'new ip', 'new user agent');
@@ -566,7 +566,7 @@ describe('Mongo', () => {
       const sessionId = await mongo.createSession(
         session.userId,
         session.ip,
-        session.userAgent
+        session.userAgent,
       );
       await delay(10);
       await mongo.invalidateSession(sessionId);
@@ -581,12 +581,12 @@ describe('Mongo', () => {
       const sessionId1 = await mongo.createSession(
         session.userId,
         session.ip,
-        session.userAgent
+        session.userAgent,
       );
       const sessionId2 = await mongo.createSession(
         session.userId,
         session.ip,
-        session.userAgent
+        session.userAgent,
       );
       await delay(10);
       await mongo.invalidateAllSessions(session.userId);
@@ -606,10 +606,10 @@ describe('Mongo', () => {
       const retUser = await mongo.findUserById(userId);
       expect(retUser.services.email.verificationTokens.length).toEqual(1);
       expect(retUser.services.email.verificationTokens[0].address).toEqual(
-        'john@doe.com'
+        'john@doe.com',
       );
       expect(retUser.services.email.verificationTokens[0].token).toEqual(
-        'token'
+        'token',
       );
       expect(retUser.services.email.verificationTokens[0].when).toBeTruthy();
     });
@@ -622,7 +622,7 @@ describe('Mongo', () => {
       const retUser = await mongo.findUserById(userId);
       expect(retUser.services.password.reset.length).toEqual(1);
       expect(retUser.services.password.reset[0].address).toEqual(
-        'john@doe.com'
+        'john@doe.com',
       );
       expect(retUser.services.password.reset[0].token).toEqual('token');
       expect(retUser.services.password.reset[0].when).toBeTruthy();

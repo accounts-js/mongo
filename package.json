@@ -10,7 +10,7 @@
     "test": "yarn lint && yarn coverage && yarn prettier-diff",
     "testonly": "jest",
     "lint": "tslint -c tslint.json '{src,__tests__}/**/*.ts'",
-    "prettier": "prettier --single-quote --trailing-comma es5 '{src,__tests__}/**/*.ts' 'README.md'",
+    "prettier": "prettier --single-quote --trailing-comma all '{src,__tests__}/**/*.ts' 'README.md'",
     "prettier-diff": "yarn prettier --list-different",
     "format": "yarn prettier --write",
     "coverage": "yarn testonly --coverage",
