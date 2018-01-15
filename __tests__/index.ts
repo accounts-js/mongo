@@ -530,6 +530,27 @@ describe('Mongo', () => {
     });
   });
 
+  describe('setService', () => {
+    it('should not convert id', async () => {
+      const mongoOptions = new Mongo(db, {
+        convertUserIdToMongoObjectId: false,
+      });
+      await mongoOptions.setService('toto', 'twitter', { id: '1' });
+    });
+
+    it('should set service', async () => {
+      const userId = await mongo.createUser(user);
+      let ret = await mongo.findUserByServiceId('google', '1');
+      expect(ret).not.toBeTruthy();
+      await mongo.setService(userId, 'google', { id: '1' });
+      ret = await mongo.findUserByServiceId('google', '1');
+      await delay(10);
+      expect(ret).toBeTruthy();
+      expect(ret._id).toBeTruthy();
+      expect(ret.id).toBeTruthy();
+    });
+  });
+
   describe('createSession', () => {
     it('should create session', async () => {
       const sessionId = await mongo.createSession(
