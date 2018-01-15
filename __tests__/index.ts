@@ -295,6 +295,13 @@ describe('Mongo', () => {
   });
 
   describe('findPasswordHash', () => {
+    it('should not convert id', async () => {
+      const mongoOptions = new Mongo(db, {
+        convertUserIdToMongoObjectId: false,
+      });
+      await mongoOptions.findPasswordHash('toto');
+    });
+
     it('should return null on not found user', async () => {
       const ret = await mongo.findPasswordHash('589871d1c9393d445745a57c');
       expect(ret).toEqual(null);
@@ -310,6 +317,13 @@ describe('Mongo', () => {
   });
 
   describe('addEmail', () => {
+    it('should not convert id', async () => {
+      const mongoOptions = new Mongo(db, {
+        convertUserIdToMongoObjectId: false,
+      });
+      await mongoOptions.addEmail('toto', 'hey', false);
+    });
+
     it('should throw if user is not found', async () => {
       try {
         await mongo.addEmail('589871d1c9393d445745a57c', 'unknowemail');
@@ -340,6 +354,13 @@ describe('Mongo', () => {
   });
 
   describe('removeEmail', () => {
+    it('should not convert id', async () => {
+      const mongoOptions = new Mongo(db, {
+        convertUserIdToMongoObjectId: false,
+      });
+      await mongoOptions.removeEmail('toto', 'hey');
+    });
+
     it('should throw if user is not found', async () => {
       try {
         await mongo.removeEmail('589871d1c9393d445745a57c', 'unknowemail');
@@ -373,6 +394,17 @@ describe('Mongo', () => {
   });
 
   describe('verifyEmail', () => {
+    it('should not convert id', async () => {
+      const mongoOptions = new Mongo(db, {
+        convertUserIdToMongoObjectId: false,
+      });
+      try {
+        await mongoOptions.verifyEmail('toto', 'hey');
+      } catch (err) {
+        expect(err.message).toEqual('User not found');
+      }
+    });
+
     it('should throw if user is not found', async () => {
       try {
         await mongo.verifyEmail('589871d1c9393d445745a57c', 'unknowemail');
@@ -399,6 +431,17 @@ describe('Mongo', () => {
   });
 
   describe('setUsername', () => {
+    it('should not convert id', async () => {
+      const mongoOptions = new Mongo(db, {
+        convertUserIdToMongoObjectId: false,
+      });
+      try {
+        await mongoOptions.setUsername('toto', 'hey');
+      } catch (err) {
+        expect(err.message).toEqual('User not found');
+      }
+    });
+
     it('should throw if user is not found', async () => {
       try {
         await mongo.setUsername('589871d1c9393d445745a57c');
@@ -420,6 +463,17 @@ describe('Mongo', () => {
   });
 
   describe('setPassword', () => {
+    it('should not convert id', async () => {
+      const mongoOptions = new Mongo(db, {
+        convertUserIdToMongoObjectId: false,
+      });
+      try {
+        await mongoOptions.setPassword('toto', 'hey');
+      } catch (err) {
+        expect(err.message).toEqual('User not found');
+      }
+    });
+
     it('should throw if user is not found', async () => {
       try {
         await mongo.setPassword('589871d1c9393d445745a57c', 'toto');
@@ -442,6 +496,13 @@ describe('Mongo', () => {
   });
 
   describe('setProfile', () => {
+    it('should not convert id', async () => {
+      const mongoOptions = new Mongo(db, {
+        convertUserIdToMongoObjectId: false,
+      });
+      await mongoOptions.setProfile('toto', { username: 'toto' });
+    });
+
     it('should change profile', async () => {
       const userId = await mongo.createUser(user);
       await delay(10);
@@ -535,6 +596,13 @@ describe('Mongo', () => {
   });
 
   describe('updateSession', () => {
+    it('should not convert id', async () => {
+      const mongoOptions = new Mongo(db, {
+        convertSessionIdToMongoObjectId: false,
+      });
+      await mongoOptions.updateSession('toto', 'new ip', 'new user agent');
+    });
+
     it('should update session', async () => {
       const sessionId = await mongo.createSession(
         session.userId,
@@ -555,6 +623,13 @@ describe('Mongo', () => {
   });
 
   describe('invalidateSession', () => {
+    it('should not convert id', async () => {
+      const mongoOptions = new Mongo(db, {
+        convertSessionIdToMongoObjectId: false,
+      });
+      await mongoOptions.invalidateSession('toto');
+    });
+
     it('invalidates a session', async () => {
       const sessionId = await mongo.createSession(
         session.userId,
