@@ -171,6 +171,18 @@ describe('Mongo', () => {
       expect(ret._id).toBeTruthy();
       expect(ret.emails[0].address).toEqual('john@doe.com');
     });
+
+    it('call options.idProvider', async () => {
+      const mongoOptions = new Mongo(db, {
+        idProvider: () => 'toto',
+        convertUserIdToMongoObjectId: false,
+      });
+      const userId = await mongoOptions.createUser({ email: 'JohN@doe.com' });
+      const ret = await mongoOptions.findUserById(userId);
+      expect(userId).toBe('toto');
+      expect(ret._id).toBeTruthy();
+      expect(ret.emails[0].address).toEqual('john@doe.com');
+    });
   });
 
   describe('findUserById', () => {

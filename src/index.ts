@@ -111,8 +111,8 @@ export default class Mongo {
     if (options.profile) {
       user.profile = options.profile;
     }
-    if (options.idProvider) {
-      user._id = options.idProvider();
+    if (this.options.idProvider) {
+      user._id = this.options.idProvider();
     }
     const ret = await this.collection.insertOne(user);
     return ret.ops[0]._id;
