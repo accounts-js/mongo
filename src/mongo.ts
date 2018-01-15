@@ -81,7 +81,7 @@ export default class Mongo implements DBInterface {
     this.db = db;
     this.collection = this.db.collection(this.options.collectionName);
     this.sessionCollection = this.db.collection(
-      this.options.sessionCollectionName,
+      this.options.sessionCollectionName
     );
   }
 
@@ -93,8 +93,7 @@ export default class Mongo implements DBInterface {
     });
   }
 
-  // TODO options: CreateUserType
-  public async createUser(options: any): Promise<string> {
+  public async createUser(options: CreateUserType): Promise<string> {
     const user: MongoUserObjectType = {
       services: {},
       profile: {},
@@ -113,8 +112,8 @@ export default class Mongo implements DBInterface {
     if (options.profile) {
       user.profile = options.profile;
     }
-    if (options.idProvider) {
-      user._id = options.idProvider();
+    if (this.options.idProvider) {
+      user._id = this.options.idProvider();
     }
     const ret = await this.collection.insertOne(user);
     return ret.ops[0]._id;
@@ -142,7 +141,7 @@ export default class Mongo implements DBInterface {
   }
 
   public async findUserByUsername(
-    username: string,
+    username: string
   ): Promise<UserObjectType | null> {
     const filter = this.options.caseSensitiveUserName
       ? { username }
@@ -168,7 +167,7 @@ export default class Mongo implements DBInterface {
   }
 
   public async findUserByEmailVerificationToken(
-    token: string,
+    token: string
   ): Promise<UserObjectType | null> {
     const user = await this.collection.findOne({
       'services.email.verificationTokens.token': token,
@@ -180,7 +179,7 @@ export default class Mongo implements DBInterface {
   }
 
   public async findUserByResetPasswordToken(
-    token: string,
+    token: string
   ): Promise<UserObjectType | null> {
     const user = await this.collection.findOne({
       'services.password.reset.token': token,
@@ -193,7 +192,7 @@ export default class Mongo implements DBInterface {
 
   public async findUserByServiceId(
     serviceName: string,
-    serviceId: string,
+    serviceId: string
   ): Promise<UserObjectType | null> {
     const user = await this.collection.findOne({
       [`services.${serviceName}.id`]: serviceId,
@@ -207,7 +206,7 @@ export default class Mongo implements DBInterface {
   public async addEmail(
     userId: string,
     newEmail: string,
-    verified: boolean,
+    verified: boolean
   ): Promise<void> {
     const id = this.options.convertUserIdToMongoObjectId
       ? toMongoID(userId)
@@ -224,7 +223,7 @@ export default class Mongo implements DBInterface {
         $set: {
           [this.options.timestamps.updatedAt]: this.options.dateProvider(),
         },
-      },
+      }
     );
     if (ret.result.nModified === 0) {
       throw new Error('User not found');
@@ -242,7 +241,7 @@ export default class Mongo implements DBInterface {
         $set: {
           [this.options.timestamps.updatedAt]: this.options.dateProvider(),
         },
-      },
+      }
     );
     if (ret.result.nModified === 0) {
       throw new Error('User not found');
@@ -261,7 +260,7 @@ export default class Mongo implements DBInterface {
           [this.options.timestamps.updatedAt]: this.options.dateProvider(),
         },
         $pull: { 'services.email.verificationTokens': { address: email } },
-      },
+      }
     );
     if (ret.result.nModified === 0) {
       throw new Error('User not found');
@@ -279,7 +278,7 @@ export default class Mongo implements DBInterface {
           username: newUsername,
           [this.options.timestamps.updatedAt]: this.options.dateProvider(),
         },
-      },
+      }
     );
     if (ret.result.nModified === 0) {
       throw new Error('User not found');
@@ -300,7 +299,7 @@ export default class Mongo implements DBInterface {
         $unset: {
           'services.password.reset': '',
         },
-      },
+      }
     );
     if (ret.result.nModified === 0) {
       throw new Error('User not found');
@@ -318,7 +317,7 @@ export default class Mongo implements DBInterface {
           profile,
           [this.options.timestamps.updatedAt]: this.options.dateProvider(),
         },
-      },
+      }
     );
     return profile;
   }
@@ -326,7 +325,7 @@ export default class Mongo implements DBInterface {
   public async setService(
     userId: string,
     serviceName: string,
-    service: object,
+    service: object
   ): Promise<void> {
     const id = this.options.convertUserIdToMongoObjectId
       ? toMongoID(userId)
@@ -338,7 +337,7 @@ export default class Mongo implements DBInterface {
           [`services.${serviceName}`]: service,
           [this.options.timestamps.updatedAt]: this.options.dateProvider(),
         },
-      },
+      }
     );
   }
 
@@ -346,7 +345,7 @@ export default class Mongo implements DBInterface {
     userId: string,
     ip?: string,
     userAgent?: string,
-    extraData?: object,
+    extraData?: object
   ): Promise<string> {
     const session = {
       userId,
@@ -369,7 +368,7 @@ export default class Mongo implements DBInterface {
   public async updateSession(
     sessionId: string,
     ip: string,
-    userAgent: string,
+    userAgent: string
   ): Promise<void> {
     // tslint:disable-next-line variable-name
     const _id = this.options.convertSessionIdToMongoObjectId
@@ -383,7 +382,7 @@ export default class Mongo implements DBInterface {
           userAgent,
           [this.options.timestamps.updatedAt]: this.options.dateProvider(),
         },
-      },
+      }
     );
   }
 
@@ -399,7 +398,7 @@ export default class Mongo implements DBInterface {
           valid: false,
           [this.options.timestamps.updatedAt]: this.options.dateProvider(),
         },
-      },
+      }
     );
   }
 
@@ -411,7 +410,7 @@ export default class Mongo implements DBInterface {
           valid: false,
           [this.options.timestamps.updatedAt]: this.options.dateProvider(),
         },
-      },
+      }
     );
   }
 
@@ -426,7 +425,7 @@ export default class Mongo implements DBInterface {
   public async addEmailVerificationToken(
     userId: string,
     email: string,
-    token: string,
+    token: string
   ): Promise<void> {
     await this.collection.update(
       { _id: userId },
@@ -435,10 +434,10 @@ export default class Mongo implements DBInterface {
           'services.email.verificationTokens': {
             token,
             address: email.toLowerCase(),
-            when: Date.now(),
+            when: this.options.dateProvider(),
           },
         },
-      },
+      }
     );
   }
 
@@ -446,7 +445,7 @@ export default class Mongo implements DBInterface {
     userId: string,
     email: string,
     token: string,
-    reason: string = 'reset',
+    reason: string = 'reset'
   ): Promise<void> {
     await this.collection.update(
       { _id: userId },
@@ -455,18 +454,18 @@ export default class Mongo implements DBInterface {
           'services.password.reset': {
             token,
             address: email.toLowerCase(),
-            when: Date.now(),
+            when: this.options.dateProvider(),
             reason,
           },
         },
-      },
+      }
     );
   }
 
   public async setResetPassword(
     userId: string,
     email: string,
-    newPassword: string,
+    newPassword: string
   ): Promise<void> {
     await this.setPassword(userId, newPassword);
   }

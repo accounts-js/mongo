@@ -70,7 +70,7 @@ describe('Mongo', () => {
         throw new Error();
       } catch (err) {
         expect(err.message).toEqual(
-          'Argument passed in must be a single String of 12 bytes or a string of 24 hex characters',
+          'Argument passed in must be a single String of 12 bytes or a string of 24 hex characters'
         );
       }
     });
@@ -85,7 +85,7 @@ describe('Mongo', () => {
 
       expect(mockFindOne.mock.calls[0][0]).toHaveProperty(
         '_id',
-        '589871d1c9393d445745a57c',
+        '589871d1c9393d445745a57c'
       );
     });
   });
@@ -103,7 +103,7 @@ describe('Mongo', () => {
       expect(mongoTestOptions.options).toBeTruthy();
       expect(mongoTestOptions.options.collectionName).toEqual('users-test');
       expect(mongoTestOptions.options.sessionCollectionName).toEqual(
-        'sessions-test',
+        'sessions-test'
       );
     });
 
@@ -171,6 +171,18 @@ describe('Mongo', () => {
       expect(ret._id).toBeTruthy();
       expect(ret.emails[0].address).toEqual('john@doe.com');
     });
+
+    it('call options.idProvider', async () => {
+      const mongoOptions = new Mongo(db, {
+        idProvider: () => 'toto',
+        convertUserIdToMongoObjectId: false,
+      });
+      const userId = await mongoOptions.createUser({ email: 'JohN@doe.com' });
+      const ret = await mongoOptions.findUserById(userId);
+      expect(userId).toBe('toto');
+      expect(ret._id).toBeTruthy();
+      expect(ret.emails[0].address).toEqual('john@doe.com');
+    });
   });
 
   describe('findUserById', () => {
@@ -218,7 +230,7 @@ describe('Mongo', () => {
     it('should return username for case insensitive query', async () => {
       const mongoWithOptions = new Mongo(db, { caseSensitiveUserName: false });
       const ret = await mongoWithOptions.findUserByUsername(
-        user.username.toUpperCase(),
+        user.username.toUpperCase()
       );
       await delay(10);
       expect(ret).toBeTruthy();
@@ -302,6 +314,13 @@ describe('Mongo', () => {
   });
 
   describe('findPasswordHash', () => {
+    it('should not convert id', async () => {
+      const mongoOptions = new Mongo(db, {
+        convertUserIdToMongoObjectId: false,
+      });
+      await mongoOptions.findPasswordHash('toto');
+    });
+
     it('should return null on not found user', async () => {
       const ret = await mongo.findPasswordHash('589871d1c9393d445745a57c');
       expect(ret).toEqual(null);
@@ -317,6 +336,13 @@ describe('Mongo', () => {
   });
 
   describe('addEmail', () => {
+    it('should not convert id', async () => {
+      const mongoOptions = new Mongo(db, {
+        convertUserIdToMongoObjectId: false,
+      });
+      await mongoOptions.addEmail('toto', 'hey', false);
+    });
+
     it('should throw if user is not found', async () => {
       try {
         await mongo.addEmail('589871d1c9393d445745a57c', 'unknowemail');
@@ -347,6 +373,13 @@ describe('Mongo', () => {
   });
 
   describe('removeEmail', () => {
+    it('should not convert id', async () => {
+      const mongoOptions = new Mongo(db, {
+        convertUserIdToMongoObjectId: false,
+      });
+      await mongoOptions.removeEmail('toto', 'hey');
+    });
+
     it('should throw if user is not found', async () => {
       try {
         await mongo.removeEmail('589871d1c9393d445745a57c', 'unknowemail');
@@ -380,6 +413,17 @@ describe('Mongo', () => {
   });
 
   describe('verifyEmail', () => {
+    it('should not convert id', async () => {
+      const mongoOptions = new Mongo(db, {
+        convertUserIdToMongoObjectId: false,
+      });
+      try {
+        await mongoOptions.verifyEmail('toto', 'hey');
+      } catch (err) {
+        expect(err.message).toEqual('User not found');
+      }
+    });
+
     it('should throw if user is not found', async () => {
       try {
         await mongo.verifyEmail('589871d1c9393d445745a57c', 'unknowemail');
@@ -406,6 +450,17 @@ describe('Mongo', () => {
   });
 
   describe('setUsername', () => {
+    it('should not convert id', async () => {
+      const mongoOptions = new Mongo(db, {
+        convertUserIdToMongoObjectId: false,
+      });
+      try {
+        await mongoOptions.setUsername('toto', 'hey');
+      } catch (err) {
+        expect(err.message).toEqual('User not found');
+      }
+    });
+
     it('should throw if user is not found', async () => {
       try {
         await mongo.setUsername('589871d1c9393d445745a57c');
@@ -427,6 +482,17 @@ describe('Mongo', () => {
   });
 
   describe('setPassword', () => {
+    it('should not convert id', async () => {
+      const mongoOptions = new Mongo(db, {
+        convertUserIdToMongoObjectId: false,
+      });
+      try {
+        await mongoOptions.setPassword('toto', 'hey');
+      } catch (err) {
+        expect(err.message).toEqual('User not found');
+      }
+    });
+
     it('should throw if user is not found', async () => {
       try {
         await mongo.setPassword('589871d1c9393d445745a57c', 'toto');
@@ -449,6 +515,13 @@ describe('Mongo', () => {
   });
 
   describe('setProfile', () => {
+    it('should not convert id', async () => {
+      const mongoOptions = new Mongo(db, {
+        convertUserIdToMongoObjectId: false,
+      });
+      await mongoOptions.setProfile('toto', { username: 'toto' });
+    });
+
     it('should change profile', async () => {
       const userId = await mongo.createUser(user);
       await delay(10);
@@ -462,7 +535,7 @@ describe('Mongo', () => {
       const sessionId = await mongo.createSession(
         session.userId,
         session.ip,
-        session.userAgent,
+        session.userAgent
       );
       const ret = await mongo.findSessionById(sessionId);
       expect(ret).toBeTruthy();
@@ -482,7 +555,7 @@ describe('Mongo', () => {
         session.userId,
         session.ip,
         session.userAgent,
-        { impersonatorUserId },
+        { impersonatorUserId }
       );
       const ret = await mongo.findSessionById(sessionId);
       expect(ret).toBeTruthy();
@@ -503,7 +576,7 @@ describe('Mongo', () => {
       const sessionId = await mongoTestOptions.createSession(
         session.userId,
         session.ip,
-        session.userAgent,
+        session.userAgent
       );
       const ret = await mongoTestOptions.findSessionById(sessionId);
       expect(ret.createdAt).toBeTruthy();
@@ -519,7 +592,7 @@ describe('Mongo', () => {
       const sessionId = await mongoTestOptions.createSession(
         session.userId,
         session.ip,
-        session.userAgent,
+        session.userAgent
       );
       const ret = await mongoTestOptions.findSessionById(sessionId);
       expect(ret._id).toBeTruthy();
@@ -542,11 +615,18 @@ describe('Mongo', () => {
   });
 
   describe('updateSession', () => {
+    it('should not convert id', async () => {
+      const mongoOptions = new Mongo(db, {
+        convertSessionIdToMongoObjectId: false,
+      });
+      await mongoOptions.updateSession('toto', 'new ip', 'new user agent');
+    });
+
     it('should update session', async () => {
       const sessionId = await mongo.createSession(
         session.userId,
         session.ip,
-        session.userAgent,
+        session.userAgent
       );
       await delay(10);
       await mongo.updateSession(sessionId, 'new ip', 'new user agent');
@@ -562,11 +642,18 @@ describe('Mongo', () => {
   });
 
   describe('invalidateSession', () => {
+    it('should not convert id', async () => {
+      const mongoOptions = new Mongo(db, {
+        convertSessionIdToMongoObjectId: false,
+      });
+      await mongoOptions.invalidateSession('toto');
+    });
+
     it('invalidates a session', async () => {
       const sessionId = await mongo.createSession(
         session.userId,
         session.ip,
-        session.userAgent,
+        session.userAgent
       );
       await delay(10);
       await mongo.invalidateSession(sessionId);
@@ -581,12 +668,12 @@ describe('Mongo', () => {
       const sessionId1 = await mongo.createSession(
         session.userId,
         session.ip,
-        session.userAgent,
+        session.userAgent
       );
       const sessionId2 = await mongo.createSession(
         session.userId,
         session.ip,
-        session.userAgent,
+        session.userAgent
       );
       await delay(10);
       await mongo.invalidateAllSessions(session.userId);
@@ -606,10 +693,10 @@ describe('Mongo', () => {
       const retUser = await mongo.findUserById(userId);
       expect(retUser.services.email.verificationTokens.length).toEqual(1);
       expect(retUser.services.email.verificationTokens[0].address).toEqual(
-        'john@doe.com',
+        'john@doe.com'
       );
       expect(retUser.services.email.verificationTokens[0].token).toEqual(
-        'token',
+        'token'
       );
       expect(retUser.services.email.verificationTokens[0].when).toBeTruthy();
     });
@@ -622,11 +709,24 @@ describe('Mongo', () => {
       const retUser = await mongo.findUserById(userId);
       expect(retUser.services.password.reset.length).toEqual(1);
       expect(retUser.services.password.reset[0].address).toEqual(
-        'john@doe.com',
+        'john@doe.com'
       );
       expect(retUser.services.password.reset[0].token).toEqual('token');
       expect(retUser.services.password.reset[0].when).toBeTruthy();
       expect(retUser.services.password.reset[0].reason).toEqual('reset');
+    });
+  });
+
+  describe('setResetPassword', () => {
+    it('should change password', async () => {
+      const newPassword = 'newpass';
+      const userId = await mongo.createUser(user);
+      await delay(10);
+      await mongo.setResetPassword(userId, 'toto', newPassword);
+      const retUser = await mongo.findUserById(userId);
+      expect(retUser.services.password.bcrypt).toBeTruthy();
+      expect(retUser.services.password.bcrypt).toEqual(newPassword);
+      expect(retUser.createdAt).not.toEqual(retUser.updatedAt);
     });
   });
 
