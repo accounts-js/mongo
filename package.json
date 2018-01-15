@@ -16,25 +16,20 @@
     "prettier-diff": "yarn prettier --list-different",
     "format": "yarn prettier --write",
     "coverage": "yarn testonly --coverage",
-    "codecov": "codecov"
+    "codecov": "codecov",
+    "precommit": "pretty-quick --staged"
   },
   "prettier": {
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "files": [
-    "src",
-    "lib"
-  ],
+  "files": ["src", "lib"],
   "jest": {
     "transform": {
       ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
     "testRegex": "./__tests__/.*.ts$",
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
+    "moduleFileExtensions": ["ts", "js"],
     "mapCoverage": true
   },
   "repository": {
