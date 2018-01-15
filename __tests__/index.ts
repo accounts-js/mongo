@@ -698,5 +698,18 @@ describe('Mongo', () => {
     });
   });
 
+  describe('setResetPassword', () => {
+    it('should change password', async () => {
+      const newPassword = 'newpass';
+      const userId = await mongo.createUser(user);
+      await delay(10);
+      await mongo.setResetPassword(userId, 'toto', newPassword);
+      const retUser = await mongo.findUserById(userId);
+      expect(retUser.services.password.bcrypt).toBeTruthy();
+      expect(retUser.services.password.bcrypt).toEqual(newPassword);
+      expect(retUser.createdAt).not.toEqual(retUser.updatedAt);
+    });
+  });
+
   afterAll(closeConnection);
 });
