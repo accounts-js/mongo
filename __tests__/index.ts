@@ -232,7 +232,6 @@ describe('Mongo', () => {
       const ret = await mongoWithOptions.findUserByUsername(
         user.username.toUpperCase()
       );
-      await delay(10);
       expect(ret).toBeTruthy();
       expect(ret._id).toBeTruthy();
       expect(ret.id).toBeTruthy();
@@ -241,20 +240,17 @@ describe('Mongo', () => {
     it('should return null for incomplete matching user when using insensitive', async () => {
       const mongoWithOptions = new Mongo(db, { caseSensitiveUserName: false });
       const ret = await mongoWithOptions.findUserByUsername('john');
-      await delay(10);
       expect(ret).not.toBeTruthy();
     });
 
     it('should return null when using regex wildcards when using insensitive', async () => {
       const mongoWithOptions = new Mongo(db, { caseSensitiveUserName: false });
       const ret = await mongoWithOptions.findUserByUsername('*');
-      await delay(10);
       expect(ret).not.toBeTruthy();
     });
 
     it('should return user', async () => {
       const ret = await mongo.findUserByUsername(user.username);
-      await delay(10);
       expect(ret).toBeTruthy();
       expect(ret._id).toBeTruthy();
       expect(ret.id).toBeTruthy();
@@ -287,7 +283,6 @@ describe('Mongo', () => {
       const userId = await mongo.createUser(user);
       await mongo.addResetPasswordToken(userId, 'john@doe.com', 'token');
       const ret = await mongo.findUserByResetPasswordToken('token');
-      await delay(10);
       expect(ret).toBeTruthy();
       expect(ret._id).toBeTruthy();
       expect(ret.id).toBeTruthy();
@@ -306,7 +301,6 @@ describe('Mongo', () => {
       expect(ret).not.toBeTruthy();
       await mongo.setService(userId, 'facebook', { id: '1' });
       ret = await mongo.findUserByServiceId('facebook', '1');
-      await delay(10);
       expect(ret).toBeTruthy();
       expect(ret._id).toBeTruthy();
       expect(ret.id).toBeTruthy();
@@ -544,7 +538,6 @@ describe('Mongo', () => {
       expect(ret).not.toBeTruthy();
       await mongo.setService(userId, 'google', { id: '1' });
       ret = await mongo.findUserByServiceId('google', '1');
-      await delay(10);
       expect(ret).toBeTruthy();
       expect(ret._id).toBeTruthy();
       expect(ret.id).toBeTruthy();
