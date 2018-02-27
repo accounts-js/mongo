@@ -7,15 +7,9 @@
     "declaration": true,
     "pretty": true,
     "removeComments": true,
+    "strict": true,
     "lib": ["es6"],
-    "types": [
-      "@types/node"
-    ]
+    "types": ["@types/node"]
   },
-  "exclude": [
-    "node_modules",
-    "__tests__",
-    "lib",
-    "lib-es6"
-  ]
+  "exclude": ["node_modules", "__tests__", "lib", "lib-es6"]
 }
