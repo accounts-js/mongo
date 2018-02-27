@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "MongoDB adaptor for accounts",
   "main": "lib/index.js",
-  "jsnext:main": "lib-es6/index.js",
+  "typings": "lib/index.d.ts",
   "scripts": {
     "start": "tsc --watch",
     "compile": "tsc",
