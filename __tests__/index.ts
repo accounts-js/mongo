@@ -625,6 +625,23 @@ describe('Mongo', () => {
     });
   });
 
+  describe('findSessionByToken', () => {
+    it('should return null for not found session', async () => {
+      const ret = await mongo.findSessionByToken('589871d1c9393d445745a57c');
+      expect(ret).not.toBeTruthy();
+    });
+
+    it('should find session', async () => {
+      const token = generateRandomToken();
+      const sessionId = await mongo.createSession(session.userId, token, {
+        ip: session.ip,
+        userAgent: session.userAgent,
+      });
+      const ret = await mongo.findSessionByToken(token);
+      expect(ret).toBeTruthy();
+    });
+  });
+
   describe('findSessionById', () => {
     it('should return null for not found session', async () => {
       const ret = await mongo.findSessionById('589871d1c9393d445745a57c');
