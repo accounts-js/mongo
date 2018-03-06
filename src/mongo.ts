@@ -86,7 +86,7 @@ export class Mongo implements DBInterface {
   }
 
   public async setupIndexes(): Promise<void> {
-    await this.collection.createIndex('token', {
+    await this.sessionCollection.createIndex('token', {
       unique: true,
       sparse: true,
     });
