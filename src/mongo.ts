@@ -1,7 +1,7 @@
 import { ObjectID, Db, Collection } from 'mongodb';
 import { get } from 'lodash';
 import { CreateUserType, UserObjectType, SessionType } from '@accounts/common';
-import { DBInterface } from '@accounts/server';
+import { DBInterface, ConnectionInformationsType } from '@accounts/server';
 
 export interface MongoOptionsType {
   // The users collection name, default 'users'.
@@ -346,14 +346,15 @@ export class Mongo implements DBInterface {
 
   public async createSession(
     userId: string,
-    ip?: string,
-    userAgent?: string,
+    token: string,
+    connection: ConnectionInformationsType,
     extraData?: object
   ): Promise<string> {
     const session = {
       userId,
-      userAgent,
-      ip,
+      token,
+      userAgent: connection.userAgent,
+      ip: connection.ip,
       extraData,
       valid: true,
       [this.options.timestamps.createdAt]: this.options.dateProvider(),
@@ -369,33 +370,24 @@ export class Mongo implements DBInterface {
   }
 
   public async updateSession(
-    sessionId: string,
-    ip: string,
-    userAgent: string
+    token: string,
+    connection: ConnectionInformationsType
   ): Promise<void> {
-    // tslint:disable-next-line variable-name
-    const _id = this.options.convertSessionIdToMongoObjectId
-      ? toMongoID(sessionId)
-      : sessionId;
     await this.sessionCollection.update(
-      { _id },
+      { token },
       {
         $set: {
-          ip,
-          userAgent,
+          userAgent: connection.userAgent,
+          ip: connection.ip,
           [this.options.timestamps.updatedAt]: this.options.dateProvider(),
         },
       }
     );
   }
 
-  public async invalidateSession(sessionId: string): Promise<void> {
-    // tslint:disable-next-line variable-name
-    const _id = this.options.convertSessionIdToMongoObjectId
-      ? toMongoID(sessionId)
-      : sessionId;
+  public async invalidateSession(token: string): Promise<void> {
     await this.sessionCollection.update(
-      { _id },
+      { token },
       {
         $set: {
           valid: false,
@@ -417,12 +409,8 @@ export class Mongo implements DBInterface {
     );
   }
 
-  public findSessionById(sessionId: string): Promise<SessionType | null> {
-    // tslint:disable-next-line variable-name
-    const _id = this.options.convertSessionIdToMongoObjectId
-      ? toMongoID(sessionId)
-      : sessionId;
-    return this.sessionCollection.findOne({ _id });
+  public findSessionByToken(token: string): Promise<SessionType | null> {
+    return this.sessionCollection.findOne({ token });
   }
 
   public async addEmailVerificationToken(
