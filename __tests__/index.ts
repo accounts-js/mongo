@@ -3,7 +3,7 @@ import * as mongodb from 'mongodb';
 import { ObjectID } from 'mongodb';
 import Mongo from '../src';
 
-let mongo;
+let mongo: Mongo;
 let db: mongodb.Db;
 let client: mongodb.MongoClient;
 const user = {
