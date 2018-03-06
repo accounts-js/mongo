@@ -7,7 +7,8 @@
   "scripts": {
     "start": "tsc --watch",
     "compile": "tsc",
-    "test": "yarn lint && yarn coverage && yarn prettier-diff",
+    "test":
+      "yarn lint && yarn coverage && yarn prettier-diff && yarn run compile",
     "testonly": "jest --forceExit",
     "lint": "tslint -c tslint.json '{src,__tests__}/**/*.ts'",
     "prettier": "prettier '{src,__tests__}/**/*.ts' 'README.md'",
