@@ -351,7 +351,7 @@ export class Mongo implements DBInterface {
   public async createSession(
     userId: string,
     token: string,
-    connection: ConnectionInformationsType,
+    connection: ConnectionInformationsType = {},
     extraData?: object
   ): Promise<string> {
     const session = {
