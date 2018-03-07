@@ -35,8 +35,7 @@
       ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
     "testRegex": "./__tests__/.*.ts$",
-    "moduleFileExtensions": ["ts", "js"],
-    "mapCoverage": true
+    "moduleFileExtensions": ["ts", "js"]
   },
   "repository": {
     "type": "git",
