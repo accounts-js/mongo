@@ -421,16 +421,24 @@ export class Mongo implements DBInterface {
     );
   }
 
-  public findSessionByToken(token: string): Promise<SessionType | null> {
-    return this.sessionCollection.findOne({ token });
+  public async findSessionByToken(token: string): Promise<SessionType | null> {
+    const session = await this.sessionCollection.findOne({ token });
+    if (session) {
+      session.id = session._id;
+    }
+    return session;
   }
 
-  public findSessionById(sessionId: string): Promise<SessionType | null> {
+  public async findSessionById(sessionId: string): Promise<SessionType | null> {
     // tslint:disable-next-line variable-name
     const _id = this.options.convertSessionIdToMongoObjectId
       ? toMongoID(sessionId)
       : sessionId;
-    return this.sessionCollection.findOne({ _id });
+    const session = await this.sessionCollection.findOne({ _id });
+    if (session) {
+      session.id = session._id;
+    }
+    return session;
   }
 
   public async addEmailVerificationToken(
