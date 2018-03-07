@@ -48,7 +48,7 @@
   },
   "homepage": "https://github.com/js-accounts/mongo",
   "devDependencies": {
-    "@accounts/common": "0.1.0-beta.2",
+    "@accounts/common": "0.1.0-beta.3",
     "@accounts/server": "0.1.0-beta.2",
     "@accounts/tslint-config-accounts": "0.0.6",
     "@types/jest": "22.2.0",
