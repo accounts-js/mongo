@@ -670,7 +670,7 @@ describe('Mongo', () => {
         userAgent: session.userAgent,
       });
       await delay(10);
-      await mongo.updateSession(token, {
+      await mongo.updateSession(sessionId, {
         ip: 'new ip',
         userAgent: 'new user agent',
       });
