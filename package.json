@@ -49,8 +49,8 @@
   },
   "homepage": "https://github.com/js-accounts/mongo",
   "devDependencies": {
-    "@accounts/common": "0.1.0-beta.2",
-    "@accounts/server": "0.1.0-beta.2",
+    "@accounts/common": "0.1.0-beta.3",
+    "@accounts/server": "0.1.0-beta.3",
     "@accounts/tslint-config-accounts": "0.0.6",
     "@types/jest": "22.2.0",
     "@types/lodash": "4.14.104",
@@ -67,8 +67,8 @@
     "typescript": "2.7.2"
   },
   "peerDependencies": {
-    "@accounts/common": "^0.1.0-beta.0",
-    "@accounts/server": "^0.1.0-beta.0"
+    "@accounts/common": "^0.1.0-beta.3",
+    "@accounts/server": "^0.1.0-beta.3"
   },
   "dependencies": {
     "lodash": "^4.17.4",
