@@ -389,9 +389,13 @@ export class Mongo implements DBInterface {
     );
   }
 
-  public async invalidateSession(token: string): Promise<void> {
+  public async invalidateSession(sessionId: string): Promise<void> {
+    // tslint:disable-next-line variable-name
+    const _id = this.options.convertSessionIdToMongoObjectId
+      ? toMongoID(sessionId)
+      : sessionId;
     await this.sessionCollection.update(
-      { token },
+      { _id },
       {
         $set: {
           valid: false,

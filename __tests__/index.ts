@@ -701,7 +701,7 @@ describe('Mongo', () => {
         userAgent: session.userAgent,
       });
       await delay(10);
-      await mongo.invalidateSession(token);
+      await mongo.invalidateSession(sessionId);
       const ret = await mongo.findSessionById(sessionId);
       expect(ret.valid).toEqual(false);
       expect(ret.createdAt).not.toEqual(ret.updatedAt);
