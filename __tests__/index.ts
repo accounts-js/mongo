@@ -551,6 +551,23 @@ describe('Mongo', () => {
     });
   });
 
+  describe('unsetService', () => {
+    it('should not convert id', async () => {
+      const mongoOptions = new Mongo(db, {
+        convertUserIdToMongoObjectId: false,
+      });
+      await mongoOptions.unsetService('toto', 'twitter');
+    });
+
+    it('should unset service', async () => {
+      const userId = await mongo.createUser(user);
+      await mongo.setService(userId, 'telegram', { id: '1' });
+      await mongo.unsetService(userId, 'telegram');
+      const ret = await mongo.findUserByServiceId('telegram', '1');
+      expect(ret).not.toBeTruthy();
+    });
+  });
+
   describe('createSession', () => {
     it('should create session', async () => {
       const token = generateRandomToken();
