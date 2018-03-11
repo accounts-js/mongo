@@ -553,10 +553,13 @@ describe('Mongo', () => {
 
   describe('unsetService', () => {
     it('should not convert id', async () => {
-      const mongoOptions = new Mongo(db, {
+      const collection: any = { update: jest.fn() };
+      const mockDb: any = { collection: () => collection };
+      const mongoOptions = new Mongo(mockDb, {
         convertUserIdToMongoObjectId: false,
       });
       await mongoOptions.unsetService('toto', 'twitter');
+      expect(collection.update.mock.calls[0][0]._id).toBe('toto');
     });
 
     it('should unset service', async () => {
